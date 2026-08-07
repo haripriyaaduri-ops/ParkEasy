@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'parking_details_screen.dart';
 
 
-
 class SearchScreen extends StatefulWidget {
-
 
   const SearchScreen({super.key});
 
@@ -12,156 +12,17 @@ class SearchScreen extends StatefulWidget {
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 
-
 }
-
 
 
 
 class _SearchScreenState extends State<SearchScreen> {
 
 
+  final searchController = TextEditingController();
 
-  TextEditingController searchController =
-  TextEditingController();
 
-
-
-
-  List<Map<String,String>> parkingList = [
-
-
-
-    {
-
-      "name":"Super Market Parking",
-
-      "slots":"30 Slots Available",
-
-      "price":"₹20/hour",
-
-      "lat":"17.3850",
-
-      "lng":"78.4867",
-
-    },
-
-
-
-
-
-    {
-
-      "name":"City Mall Parking",
-
-      "slots":"25 Slots Available",
-
-      "price":"₹30/hour",
-
-      "lat":"16.5062",
-
-      "lng":"80.6480",
-
-    },
-
-
-
-
-
-    {
-
-      "name":"Railway Station Parking",
-
-      "slots":"15 Slots Available",
-
-      "price":"₹40/hour",
-
-      "lat":"13.6288",
-
-      "lng":"79.4192",
-
-    },
-
-
-
-
-
-
-    {
-
-      "name":"PVR Parking",
-
-      "slots":"20 Slots Available",
-
-      "price":"₹50/hour",
-
-      "lat":"19.0760",
-
-      "lng":"72.8777",
-
-    },
-
-
-
-  ];
-
-
-
-
-
-  List<Map<String,String>> filteredList=[];
-
-
-
-
-
-  @override
-  void initState(){
-
-
-    super.initState();
-
-
-    filteredList = parkingList;
-
-
-  }
-
-
-
-
-
-
-  void searchParking(String value){
-
-
-    setState((){
-
-
-      filteredList = parkingList.where((parking){
-
-
-
-        return parking["name"]!
-
-            .toLowerCase()
-
-            .contains(value.toLowerCase());
-
-
-
-      }).toList();
-
-
-
-    });
-
-
-
-  }
-
-
-
+  String searchText = "";
 
 
 
@@ -172,33 +33,23 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
 
 
+      appBar: AppBar(
 
-      appBar:AppBar(
 
-
-        title:const Text(
-
+        title: const Text(
 
           "Search Parking",
 
+          style: TextStyle(
 
-          style:TextStyle(
-
-
-            color:Colors.white,
-
+            color: Colors.white,
 
           ),
-
 
         ),
 
 
-        backgroundColor:Colors.blue,
-
-
-        centerTitle:true,
-
+        backgroundColor: Colors.blue,
 
       ),
 
@@ -206,22 +57,17 @@ class _SearchScreenState extends State<SearchScreen> {
 
 
 
-
-      body:Padding(
-
+      body: Padding(
 
 
-        padding:const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
 
 
 
-
-        child:Column(
-
+        child: Column(
 
 
-          children:[
-
+          children: [
 
 
 
@@ -229,40 +75,25 @@ class _SearchScreenState extends State<SearchScreen> {
 
 
 
-              controller:searchController,
+              controller: searchController,
 
 
 
-              onChanged:searchParking,
+              decoration: InputDecoration(
 
 
 
-              decoration:InputDecoration(
+                hintText: "Search parking name",
 
 
 
-                hintText:"Search Parking",
+                prefixIcon:
+                const Icon(Icons.search),
 
 
 
-                prefixIcon:const Icon(
-
-
-
-                  Icons.search,
-
-
-                  color:Colors.blue,
-
-
-
-                ),
-
-
-
-
-
-                border:OutlineInputBorder(
+                border:
+                OutlineInputBorder(
 
 
 
@@ -279,8 +110,29 @@ class _SearchScreenState extends State<SearchScreen> {
 
 
 
-            ),
 
+              onChanged:(value){
+
+
+
+                setState((){
+
+
+
+                  searchText =
+                  value.toLowerCase();
+
+
+
+                });
+
+
+
+              },
+
+
+
+            ),
 
 
 
@@ -296,194 +148,154 @@ class _SearchScreenState extends State<SearchScreen> {
 
 
 
-              child:ListView.builder(
+              child:
+              StreamBuilder<QuerySnapshot>(
 
 
 
-                itemCount:filteredList.length,
+                stream:
+                FirebaseFirestore.instance
 
+                    .collection("parkings")
 
-
-                itemBuilder:(context,index){
-
-
-
-                  var parking =
-                  filteredList[index];
-
+                    .snapshots(),
 
 
 
 
-                  return Card(
+                builder:(context,snapshot){
 
 
 
-                    elevation:3,
+                  if(!snapshot.hasData){
 
 
 
-                    margin:
-                    const EdgeInsets.only(bottom:12),
+                    return const Center(
+
+                      child:
+                      CircularProgressIndicator(),
+
+                    );
 
 
 
-
-
-                    child:ListTile(
-
-
-
-
-                      leading:const CircleAvatar(
-
-
-
-                        backgroundColor:
-                        Colors.blue,
-
-
-
-                        child:Icon(
-
-
-
-                          Icons.local_parking,
-
-
-                          color:Colors.white,
-
-
-
-                        ),
-
-
-
-                      ),
+                  }
 
 
 
 
 
 
-                      title:Text(
+                  var parkings =
+                  snapshot.data!.docs.where((doc){
 
 
 
-                        parking["name"]!,
+                    String name =
+                    doc["name"].toString()
+                        .toLowerCase();
 
 
 
-                        style:const TextStyle(
+
+                    return name.contains(searchText);
 
 
 
-                          fontWeight:
-                          FontWeight.bold,
+                  }).toList();
 
+
+
+
+
+
+
+                  if(parkings.isEmpty){
+
+
+
+                    return const Center(
+
+
+
+                      child:Text(
+
+                        "No Parking Found",
+
+                        style:
+                        TextStyle(
+
+                          fontSize:20,
 
                         ),
 
-
-
                       ),
 
 
 
+                    );
 
 
-                      subtitle:Text(
 
+                  }
 
 
-                        parking["slots"]!,
 
 
 
-                      ),
 
 
 
+                  return ListView.builder(
 
 
 
-                      trailing:Text(
+                    itemCount:
+                    parkings.length,
 
 
 
-                        parking["price"]!,
 
+                    itemBuilder:(context,index){
 
 
-                        style:const TextStyle(
 
+                      var parking =
+                      parkings[index];
 
 
-                          color:Colors.green,
 
 
-                          fontWeight:
-                          FontWeight.bold,
+                      return Card(
 
 
 
-                        ),
+                        elevation:5,
 
 
 
-                      ),
+                        child:ListTile(
 
 
 
+                          leading:
+                          const CircleAvatar(
 
 
 
-                      onTap:(){
+                            backgroundColor:
+                            Colors.blue,
 
 
 
-                        Navigator.push(
+                            child:
+                            Icon(
 
+                              Icons.local_parking,
 
-
-                          context,
-
-
-
-                          MaterialPageRoute(
-
-
-
-                            builder:(context)=>
-
-                            ParkingDetails(
-
-
-
-                              name:
-                              parking["name"]!,
-
-
-
-                              slots:
-                              parking["slots"]!,
-
-
-
-                              price:
-                              parking["price"]!,
-
-
-
-                              latitude:
-                              parking["lat"]!,
-
-
-
-                              longitude:
-                              parking["lng"]!,
-
-
+                              color:
+                              Colors.white,
 
                             ),
 
@@ -493,22 +305,125 @@ class _SearchScreenState extends State<SearchScreen> {
 
 
 
-                        );
+
+
+                          title:Text(
+
+                            parking["name"],
+
+                          ),
 
 
 
-                      },
+
+                          subtitle:Text(
+
+                            parking["address"],
+
+                          ),
 
 
 
 
 
-                    ),
+                          trailing:Text(
+
+                            "₹${parking["price"]}",
+
+                            style:
+                            const TextStyle(
+
+                              color:
+                              Colors.green,
+
+                              fontWeight:
+                              FontWeight.bold,
+
+                            ),
+
+                          ),
+
+
+
+
+
+
+                          onTap:(){
+
+
+
+                            Navigator.push(
+
+
+
+                              context,
+
+
+
+                              MaterialPageRoute(
+
+
+
+                                builder:(context)=>
+
+                                ParkingDetails(
+
+
+
+                                  name:
+                                  parking["name"],
+
+
+
+                                  slots:
+                                  "${parking["slots"]} Slots Available",
+
+
+
+                                  price:
+                                  "₹${parking["price"]}",
+
+
+
+                                  latitude:
+                                  parking["latitude"].toString(),
+
+
+
+                                  longitude:
+                                  parking["longitude"].toString(),
+
+
+
+                                ),
+
+
+
+                              ),
+
+
+
+                            );
+
+
+
+                          },
+
+
+
+                        ),
+
+
+
+                      );
+
+
+
+                    },
 
 
 
                   );
-
 
 
 
@@ -520,7 +435,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
 
 
-            ),
+            )
 
 
 

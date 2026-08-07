@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../vehicle_details.dart';
+import 'map_screen.dart';
 
 
 
@@ -18,9 +18,7 @@ class ParkingDetails extends StatelessWidget {
 
   const ParkingDetails({
 
-
     super.key,
-
 
     required this.name,
 
@@ -32,34 +30,38 @@ class ParkingDetails extends StatelessWidget {
 
     required this.longitude,
 
-
   });
 
 
 
-  Future<void> openMap() async {
+  void openMap(BuildContext context) {
 
 
-    final Uri url = Uri.parse(
+    Navigator.push(
 
-      "https://www.google.com/maps/search/?api=1&query=$latitude,$longitude"
+      context,
+
+      MaterialPageRoute(
+
+        builder:(context)=>MapScreen(
+
+          parkingName:name,
+
+          latitude:double.parse(latitude),
+
+          longitude:double.parse(longitude),
+
+          address:"Vijayawada",
+
+          slots:slots,
+
+          price:price,
+
+        ),
+
+      ),
 
     );
-
-
-    if(await canLaunchUrl(url)){
-
-
-      await launchUrl(
-
-        url,
-
-        mode: LaunchMode.externalApplication,
-
-      );
-
-
-    }
 
 
   }
@@ -77,44 +79,31 @@ class ParkingDetails extends StatelessWidget {
 
       appBar: AppBar(
 
-
-        backgroundColor: Colors.blue,
-
+        backgroundColor:Colors.blue,
 
         centerTitle:true,
 
-
         title:const Text(
-
 
           "Parking Details",
 
-
           style:TextStyle(
-
 
             color:Colors.white,
 
             fontWeight:FontWeight.bold,
 
-
           ),
 
-
         ),
-
 
       ),
 
 
 
-
-
       body:Padding(
 
-
         padding:const EdgeInsets.all(20),
-
 
 
         child:Column(
@@ -123,29 +112,22 @@ class ParkingDetails extends StatelessWidget {
           crossAxisAlignment:CrossAxisAlignment.start,
 
 
-
           children:[
 
 
 
             Container(
 
-
               height:180,
-
 
               width:double.infinity,
 
 
-
               decoration:BoxDecoration(
-
 
                 color:Colors.blue.shade100,
 
-
                 borderRadius:BorderRadius.circular(20),
-
 
               ),
 
@@ -153,19 +135,79 @@ class ParkingDetails extends StatelessWidget {
 
               child:const Icon(
 
-
                 Icons.local_parking,
-
 
                 size:100,
 
-
                 color:Colors.blue,
-
 
               ),
 
 
+            ),
+
+
+
+
+            const SizedBox(height:25),
+
+
+
+            Text(
+
+              name,
+
+              style:const TextStyle(
+
+                fontSize:28,
+
+                fontWeight:FontWeight.bold,
+
+              ),
+
+            ),
+
+
+
+
+            const SizedBox(height:15),
+
+
+
+
+            Text(
+
+              slots,
+
+              style:const TextStyle(
+
+                fontSize:18,
+
+              ),
+
+            ),
+
+
+
+
+            const SizedBox(height:10),
+
+
+
+
+            Text(
+
+              price,
+
+              style:const TextStyle(
+
+                fontSize:22,
+
+                color:Colors.green,
+
+                fontWeight:FontWeight.bold,
+
+              ),
 
             ),
 
@@ -178,108 +220,25 @@ class ParkingDetails extends StatelessWidget {
 
 
 
-            Text(
-
-
-              name,
-
-
-              style:const TextStyle(
-
-
-                fontSize:28,
-
-
-                fontWeight:FontWeight.bold,
-
-
-              ),
-
-
-            ),
-
-
-
-
-            const SizedBox(height:15),
-
-
-
-
-
-            Text(
-
-
-              slots,
-
-
-              style:const TextStyle(
-
-
-                fontSize:18,
-
-
-              ),
-
-
-            ),
-
-
-
-
-            const SizedBox(height:10),
-
-
-
-
-
-            Text(
-
-
-              price,
-
-
-              style:const TextStyle(
-
-
-                fontSize:22,
-
-
-                color:Colors.green,
-
-
-                fontWeight:FontWeight.bold,
-
-
-              ),
-
-
-            ),
-
-
-
-
-
-            const SizedBox(height:20),
-
-
-
-
-
             SizedBox(
 
-
               width:double.infinity,
-
 
 
               child:ElevatedButton.icon(
 
 
-                onPressed:openMap,
+
+                onPressed:(){
+
+                  openMap(context);
+
+                },
 
 
-                icon:const Icon(Icons.location_on),
+
+                icon:const Icon(Icons.map),
+
 
 
                 label:const Text(
@@ -292,21 +251,16 @@ class ParkingDetails extends StatelessWidget {
 
                 style:ElevatedButton.styleFrom(
 
-
                   backgroundColor:Colors.green,
-
 
                   foregroundColor:Colors.white,
 
-
                   padding:const EdgeInsets.all(15),
-
 
                 ),
 
 
               ),
-
 
 
             ),
@@ -323,7 +277,6 @@ class ParkingDetails extends StatelessWidget {
 
             SizedBox(
 
-
               width:double.infinity,
 
 
@@ -335,29 +288,28 @@ class ParkingDetails extends StatelessWidget {
                 onPressed:(){
 
 
-
                   Navigator.push(
-
 
 
                     context,
 
 
-
                     MaterialPageRoute(
 
 
+                      builder:(context)=>VehicleDetails(
 
-                      builder:(context)=>const VehicleDetails(),
 
+                        parkingName:name,
+
+
+                      ),
 
 
                     ),
 
 
-
                   );
-
 
 
                 },
@@ -377,12 +329,10 @@ class ParkingDetails extends StatelessWidget {
 
 
 
-
                 child:const Text(
 
 
                   "Book Now",
-
 
 
                   style:TextStyle(
@@ -400,20 +350,16 @@ class ParkingDetails extends StatelessWidget {
                 ),
 
 
-
               ),
 
 
-
-            )
-
+            ),
 
 
           ],
 
 
         ),
-
 
       ),
 

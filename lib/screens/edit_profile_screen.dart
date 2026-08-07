@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../user_data.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 
@@ -10,7 +11,8 @@ class EditProfileScreen extends StatefulWidget {
 
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  State<EditProfileScreen> createState() =>
+      _EditProfileScreenState();
 
 
 }
@@ -18,40 +20,184 @@ class EditProfileScreen extends StatefulWidget {
 
 
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+
+class _EditProfileScreenState
+    extends State<EditProfileScreen> {
 
 
-  late TextEditingController nameController;
-  late TextEditingController emailController;
-  late TextEditingController vehicleNumberController;
+
+  final nameController =
+      TextEditingController();
+
+
+  final emailController =
+      TextEditingController();
+
+
+  final vehicleNumberController =
+      TextEditingController();
+
 
 
   String vehicleType = "Car";
 
 
+  bool loading = true;
+
+
+
 
   @override
-  void initState() {
+  void initState(){
 
     super.initState();
 
+    loadUserData();
 
-    nameController =
-        TextEditingController(text: UserData.name);
-
-
-    emailController =
-        TextEditingController(text: UserData.email);
+  }
 
 
-    vehicleNumberController =
-        TextEditingController(text: UserData.vehicleNumber);
 
 
-    vehicleType = UserData.vehicleType;
+
+
+  Future<void> loadUserData() async {
+
+
+    final user =
+        FirebaseAuth.instance.currentUser;
+
+
+
+    final snapshot =
+        await FirebaseFirestore.instance
+            .collection("users")
+            .doc(user!.uid)
+            .get();
+
+
+
+    if(snapshot.exists){
+
+
+      final data =
+          snapshot.data()!;
+
+
+
+      nameController.text =
+          data["name"] ?? "";
+
+
+
+      emailController.text =
+          data["email"] ?? "";
+
+
+
+      vehicleNumberController.text =
+          data["vehicleNumber"] ?? "";
+
+
+
+      vehicleType =
+          data["vehicleType"] ?? "Car";
+
+
+    }
+
+
+
+    setState(() {
+
+
+      loading = false;
+
+
+    });
 
 
   }
+
+
+
+
+
+
+
+  Future<void> updateProfile() async {
+
+
+
+    final user =
+        FirebaseAuth.instance.currentUser;
+
+
+
+
+    await FirebaseFirestore.instance
+        .collection("users")
+        .doc(user!.uid)
+        .update({
+
+
+
+      "name":
+      nameController.text.trim(),
+
+
+
+      "email":
+      emailController.text.trim(),
+
+
+
+      "vehicleType":
+      vehicleType,
+
+
+
+      "vehicleNumber":
+      vehicleNumberController.text.trim(),
+
+
+
+    });
+
+
+
+
+
+    ScaffoldMessenger.of(context)
+        .showSnackBar(
+
+
+
+      const SnackBar(
+
+        content:
+        Text(
+          "Profile Updated Successfully",
+        ),
+
+      ),
+
+
+
+    );
+
+
+
+
+
+    Navigator.pop(context);
+
+
+
+  }
+
+
+
 
 
 
@@ -61,28 +207,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget build(BuildContext context) {
 
 
+
     return Scaffold(
+
 
 
       appBar: AppBar(
 
 
-        title: const Text(
+
+        title:
+        const Text(
 
           "Edit Profile",
 
-          style: TextStyle(
+          style:
+          TextStyle(
 
-            color: Colors.white,
+            color:Colors.white,
 
           ),
 
         ),
 
 
-        backgroundColor: Colors.blue,
+
+        backgroundColor:
+        Colors.blue,
 
         centerTitle:true,
+
 
 
       ),
@@ -90,45 +244,87 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
 
 
-      body: Padding(
 
 
-        padding: const EdgeInsets.all(20),
+      body:
 
 
 
-        child: Column(
+      loading
+
+
+
+          ? const Center(
+
+        child:
+        CircularProgressIndicator(),
+
+      )
+
+
+
+          :
+
+      Padding(
+
+
+
+        padding:
+        const EdgeInsets.all(20),
+
+
+
+        child:
+        Column(
+
 
 
           children:[
 
 
 
+
+
             TextField(
 
 
-              controller:nameController,
+
+              controller:
+              nameController,
 
 
-              decoration:InputDecoration(
+
+              decoration:
+              InputDecoration(
 
 
-                labelText:"Name",
+
+                labelText:
+                "Name",
 
 
-                border:OutlineInputBorder(
+
+                border:
+                OutlineInputBorder(
 
 
-                  borderRadius:BorderRadius.circular(15),
+
+                  borderRadius:
+                  BorderRadius.circular(15),
+
 
 
                 ),
 
 
+
               ),
 
 
+
             ),
+
+
 
 
 
@@ -137,28 +333,43 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
 
 
+
+
             TextField(
 
 
-              controller:emailController,
+
+              controller:
+              emailController,
 
 
-              decoration:InputDecoration(
+
+              decoration:
+              InputDecoration(
 
 
-                labelText:"Email",
+
+                labelText:
+                "Email",
 
 
-                border:OutlineInputBorder(
+
+                border:
+                OutlineInputBorder(
 
 
-                  borderRadius:BorderRadius.circular(15),
+
+                  borderRadius:
+                  BorderRadius.circular(15),
+
 
 
                 ),
 
 
+
               ),
+
 
 
             ),
@@ -166,7 +377,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
 
 
+
+
             const SizedBox(height:15),
+
+
 
 
 
@@ -174,25 +389,38 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             DropdownButtonFormField<String>(
 
 
-              value:vehicleType,
+
+              value:
+              vehicleType,
 
 
-              decoration:InputDecoration(
+
+              decoration:
+              InputDecoration(
 
 
-                labelText:"Vehicle Type",
+
+                labelText:
+                "Vehicle Type",
 
 
-                border:OutlineInputBorder(
+
+                border:
+                OutlineInputBorder(
 
 
-                  borderRadius:BorderRadius.circular(15),
+
+                  borderRadius:
+                  BorderRadius.circular(15),
+
 
 
                 ),
 
 
+
               ),
+
 
 
 
@@ -206,37 +434,50 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               ]
 
-              .map((e)=>DropdownMenuItem(
+                  .map((e)=>DropdownMenuItem(
+
 
 
                 value:e,
 
 
-                child:Text(e),
+
+                child:
+                Text(e),
+
 
 
               ))
 
-              .toList(),
+                  .toList(),
+
+
 
 
 
               onChanged:(value){
 
 
+
                 setState((){
 
 
-                  vehicleType=value!;
+
+                  vehicleType =
+                  value!;
+
 
 
                 });
 
 
+
               },
 
 
+
             ),
+
 
 
 
@@ -247,31 +488,47 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
 
 
+
+
             TextField(
 
 
-              controller:vehicleNumberController,
+
+              controller:
+              vehicleNumberController,
 
 
-              decoration:InputDecoration(
+
+              decoration:
+              InputDecoration(
 
 
-                labelText:"Vehicle Number",
+
+                labelText:
+                "Vehicle Number",
 
 
-                border:OutlineInputBorder(
+
+                border:
+                OutlineInputBorder(
 
 
-                  borderRadius:BorderRadius.circular(15),
+
+                  borderRadius:
+                  BorderRadius.circular(15),
+
 
 
                 ),
 
 
+
               ),
 
 
+
             ),
+
 
 
 
@@ -283,96 +540,101 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
 
 
+
             SizedBox(
 
 
-              width:double.infinity,
 
-
-              child:ElevatedButton(
-
-
-                onPressed:(){
+              width:
+              double.infinity,
 
 
 
-                  UserData.name =
-                  nameController.text;
-
-
-                  UserData.email =
-                  emailController.text;
-
-
-                  UserData.vehicleType =
-                  vehicleType;
-
-
-                  UserData.vehicleNumber =
-                  vehicleNumberController.text;
+              child:
+              ElevatedButton(
 
 
 
-
-                  Navigator.pop(context);
-
-
-
-                },
+                onPressed:
+                updateProfile,
 
 
 
-                style:ElevatedButton.styleFrom(
+                style:
+                ElevatedButton.styleFrom(
 
 
-                  backgroundColor:Colors.blue,
+
+                  backgroundColor:
+                  Colors.blue,
 
 
-                  padding:const EdgeInsets.all(15),
+
+                  padding:
+                  const EdgeInsets.all(15),
+
 
 
                 ),
 
 
 
-                child:const Text(
+                child:
+                const Text(
+
 
 
                   "Save Changes",
 
 
-                  style:TextStyle(
+
+                  style:
+                  TextStyle(
 
 
-                    color:Colors.white,
+
+                    color:
+                    Colors.white,
 
 
-                    fontSize:18,
+
+                    fontSize:
+                    18,
+
 
 
                   ),
 
 
+
                 ),
 
 
+
               ),
+
 
 
             )
 
 
 
+
+
           ],
+
 
 
         ),
 
 
+
       ),
 
 
+
     );
+
 
 
   }

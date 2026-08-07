@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+
 import 'screens/home_screen.dart';
 import 'screens/rating_screen.dart';
 import 'receipt.dart';
 import 'booking_data.dart';
-import 'package:qr_flutter/qr_flutter.dart';
-
 
 
 class BookingConfirmed extends StatefulWidget {
 
 
+  final String parkingName;
   final String vehicleNumber;
   final String vehicleType;
   final String parkingSlot;
@@ -22,14 +24,11 @@ class BookingConfirmed extends StatefulWidget {
 
     super.key,
 
+    required this.parkingName,
     required this.vehicleNumber,
-
     required this.vehicleType,
-
     required this.parkingSlot,
-
     required this.duration,
-
     required this.amount,
 
   });
@@ -43,57 +42,160 @@ class BookingConfirmed extends StatefulWidget {
 
 
 
-
 class _BookingConfirmedState extends State<BookingConfirmed> {
 
 
   late String bookingId;
-
   late String bookingDate;
 
 
 
   @override
-  void initState(){
+  void initState() {
 
     super.initState();
 
 
-
     bookingId =
-    "PE${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
-
+        "PE${DateTime.now()
+            .millisecondsSinceEpoch
+            .toString()
+            .substring(7)}";
 
 
     bookingDate =
-    "${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}";
+        "${DateTime.now().day}-"
+        "${DateTime.now().month}-"
+        "${DateTime.now().year}";
 
 
-
-    // SAVE BOOKING HISTORY
 
     BookingData.history.add({
 
-      "parking": "City Mall Parking",
-
+      "parking": widget.parkingName,
       "slot": widget.parkingSlot,
-
       "vehicle": widget.vehicleNumber,
-
       "type": widget.vehicleType,
-
       "duration": widget.duration,
-
       "amount": "₹${widget.amount}",
-
       "date": bookingDate,
-
       "status": "Confirmed",
 
     });
 
 
+
+    saveBooking();
+
   }
+
+
+
+
+
+
+  Future<void> saveBooking() async {
+
+
+    print("BOOKING PARKING = ${widget.parkingName}");
+
+
+
+    await FirebaseFirestore.instance
+        .collection("bookings")
+        .add({
+
+
+      "bookingId": bookingId,
+
+
+      "parking": widget.parkingName,
+
+
+      "slot": widget.parkingSlot,
+
+
+      "vehicleNumber": widget.vehicleNumber,
+
+
+      "vehicleType": widget.vehicleType,
+
+
+      "duration": widget.duration,
+
+
+      "amount": widget.amount,
+
+
+      "date": bookingDate,
+
+
+      "status": "Confirmed",
+
+
+      "createdAt": Timestamp.now(),
+
+
+    });
+
+
+  }
+
+
+
+
+
+
+  Future<void> cancelBooking() async {
+
+
+    // latest booking cancel
+
+
+    QuerySnapshot query =
+    await FirebaseFirestore.instance
+        .collection("bookings")
+        .where(
+        "bookingId",
+        isEqualTo: bookingId
+    )
+        .get();
+
+
+
+    for(var doc in query.docs){
+
+
+      await doc.reference.update({
+
+
+        "status":"Cancelled",
+
+
+      });
+
+
+    }
+
+
+
+    ScaffoldMessenger.of(context).showSnackBar(
+
+      const SnackBar(
+
+        content: Text(
+            "Booking Cancelled"
+        ),
+
+      ),
+
+    );
+
+  }
+
+
+
+
 
 
 
@@ -107,28 +209,22 @@ class _BookingConfirmedState extends State<BookingConfirmed> {
       appBar: AppBar(
 
 
-        backgroundColor: Colors.blue,
-
-
-        centerTitle:true,
-
-
-        title:const Text(
-
+        title: const Text(
 
           "Booking Confirmed",
 
+          style: TextStyle(
 
-          style:TextStyle(
-
-
-            color:Colors.white,
-
+            color: Colors.white,
 
           ),
 
-
         ),
+
+
+        backgroundColor: Colors.blue,
+
+        centerTitle:true,
 
 
       ),
@@ -139,8 +235,8 @@ class _BookingConfirmedState extends State<BookingConfirmed> {
       body:SingleChildScrollView(
 
 
-        padding:const EdgeInsets.all(20),
-
+        padding:
+        const EdgeInsets.all(20),
 
 
         child:Column(
@@ -149,46 +245,33 @@ class _BookingConfirmedState extends State<BookingConfirmed> {
           children:[
 
 
-
             const Icon(
-
 
               Icons.check_circle,
 
-
               color:Colors.green,
 
-
               size:100,
-
 
             ),
 
 
 
-
-            const SizedBox(height:15),
-
+            const SizedBox(height:20),
 
 
 
             const Text(
 
-
               "Booking Successful!",
-
 
               style:TextStyle(
 
-
                 fontSize:28,
-
 
                 fontWeight:FontWeight.bold,
 
-
               ),
-
 
             ),
 
@@ -203,65 +286,74 @@ class _BookingConfirmedState extends State<BookingConfirmed> {
             Card(
 
 
-              elevation:4,
+              child:Column(
 
 
-              child:Padding(
+                children:[
 
 
-                padding:const EdgeInsets.all(15),
+                  details(
+                      "Booking ID",
+                      bookingId
+                  ),
+
+
+                  details(
+                      "Parking",
+                      widget.parkingName
+                  ),
+
+
+                  details(
+                      "Slot",
+                      widget.parkingSlot
+                  ),
+
+
+                  details(
+                      "Vehicle",
+                      widget.vehicleNumber
+                  ),
+
+
+                  details(
+                      "Vehicle Type",
+                      widget.vehicleType
+                  ),
+
+
+                  details(
+                      "Duration",
+                      widget.duration
+                  ),
+
+
+                  details(
+                      "Amount",
+                      "₹${widget.amount}"
+                  ),
+
+
+                  details(
+                      "Status",
+                      "Confirmed"
+                  ),
 
 
 
-                child:Column(
-
-
-                  children:[
-
-
-                    details("Booking ID",bookingId),
-
-
-                    details("Date",bookingDate),
-
-
-                    details("Parking","City Mall Parking"),
-
-
-                    details("Slot",widget.parkingSlot),
-
-
-                    details("Vehicle Number",widget.vehicleNumber),
-
-
-                    details("Vehicle Type",widget.vehicleType),
-
-
-                    details("Duration",widget.duration),
-
-
-                    details("Amount","₹${widget.amount}"),
-
-
-                    details("Status","Confirmed"),
-
-
-
-                  ],
-
-
-                ),
-
+                ],
 
               ),
-
 
             ),
 
 
 
 
-            const SizedBox(height:25),
+
+
+            const SizedBox(height:20),
+
 
 
 
@@ -269,141 +361,76 @@ class _BookingConfirmedState extends State<BookingConfirmed> {
             QrImageView(
 
 
-              data:"""
+              data:
 
+              """
 ParkEasy Booking
 
-Booking ID: $bookingId
+ID:$bookingId
 
-Parking: City Mall Parking
+Parking:${widget.parkingName}
 
-Slot: ${widget.parkingSlot}
+Slot:${widget.parkingSlot}
 
-Vehicle: ${widget.vehicleNumber}
+Vehicle:${widget.vehicleNumber}
 
-Vehicle Type: ${widget.vehicleType}
+Amount:${widget.amount}
 
-Duration: ${widget.duration}
-
-Amount: ₹${widget.amount}
-
-Date: $bookingDate
-
-Status: Confirmed
+Status:Confirmed
 
 """,
 
 
               size:220,
 
-
             ),
 
 
 
-            const SizedBox(height:10),
 
 
 
-            const Text(
-
-
-              "Show this QR at Parking Entry",
-
-
-              style:TextStyle(
-
-
-                fontWeight:FontWeight.bold,
-
-
-                color:Colors.grey,
-
-
-              ),
-
-
-            ),
+            const SizedBox(height:20),
 
 
 
-            const SizedBox(height:25),
-                        SizedBox(
+
+
+            SizedBox(
 
               width:double.infinity,
+
 
               child:ElevatedButton.icon(
 
 
-                icon:const Icon(Icons.download),
+                icon:
+                const Icon(Icons.cancel),
 
 
-                label:const Text(
-
-                  "Download Receipt",
-
+                label:
+                const Text(
+                    "Cancel Booking"
                 ),
 
+
+                onPressed:cancelBooking,
 
 
                 style:ElevatedButton.styleFrom(
 
-                  backgroundColor:Colors.green,
+                  backgroundColor:Colors.red,
 
                   foregroundColor:Colors.white,
-
-                  padding:const EdgeInsets.symmetric(
-
-                    vertical:15,
-
-                  ),
 
                 ),
 
 
-
-                onPressed:(){
-
-
-                  Navigator.push(
-
-                    context,
-
-                    MaterialPageRoute(
-
-                      builder:(context)=>ReceiptPage(
-
-
-                        bookingId:bookingId,
-
-
-                        vehicleNumber:widget.vehicleNumber,
-
-
-                        vehicleType:widget.vehicleType,
-
-
-                        date:bookingDate,
-
-
-                        duration:widget.duration,
-
-
-                        amount:widget.amount,
-
-
-                      ),
-
-                    ),
-
-                  );
-
-
-                },
-
               ),
 
             ),
+
+
 
 
 
@@ -413,36 +440,23 @@ Status: Confirmed
 
 
 
+
+
             SizedBox(
 
               width:double.infinity,
 
+
               child:ElevatedButton.icon(
 
 
-                icon:const Icon(Icons.star),
+                icon:
+                const Icon(Icons.download),
 
 
-                label:const Text(
-
-                  "Rate Parking",
-
-                ),
-
-
-
-                style:ElevatedButton.styleFrom(
-
-                  backgroundColor:Colors.orange,
-
-                  foregroundColor:Colors.white,
-
-                  padding:const EdgeInsets.symmetric(
-
-                    vertical:15,
-
-                  ),
-
+                label:
+                const Text(
+                    "Receipt"
                 ),
 
 
@@ -452,22 +466,55 @@ Status: Confirmed
 
                   Navigator.push(
 
+
                     context,
+
 
                     MaterialPageRoute(
 
-                      builder:(context)=>const RatingScreen(),
+
+                      builder:(context)=>
+
+                          ReceiptPage(
+
+
+                            bookingId: bookingId,
+
+                            vehicleNumber:
+                            widget.vehicleNumber,
+
+                            vehicleType:
+                            widget.vehicleType,
+
+                            date:
+                            bookingDate,
+
+                            duration:
+                            widget.duration,
+
+                            amount:
+                            widget.amount,
+
+
+                          ),
+
 
                     ),
+
 
                   );
 
 
                 },
 
+
               ),
 
+
             ),
+
+
+
 
 
 
@@ -477,36 +524,86 @@ Status: Confirmed
 
 
 
+
             SizedBox(
 
+
               width:double.infinity,
+
 
               child:ElevatedButton.icon(
 
 
-                icon:const Icon(Icons.home),
+                icon:
+                const Icon(Icons.star),
 
 
-                label:const Text(
-
-                  "Go Home",
-
+                label:
+                const Text(
+                    "Rate Parking"
                 ),
 
 
 
-                style:ElevatedButton.styleFrom(
+                onPressed:(){
 
-                  backgroundColor:Colors.blue,
 
-                  foregroundColor:Colors.white,
+                  Navigator.push(
 
-                  padding:const EdgeInsets.symmetric(
 
-                    vertical:15,
+                    context,
 
-                  ),
 
+                    MaterialPageRoute(
+
+
+                     builder:(context)=> RatingScreen(
+  parkingName: widget.parkingName,
+),
+
+                    ),
+
+
+                  );
+
+
+                },
+
+
+              ),
+
+
+            ),
+
+
+
+
+
+
+
+            const SizedBox(height:15),
+
+
+
+
+
+
+            SizedBox(
+
+
+              width:double.infinity,
+
+
+              child:ElevatedButton.icon(
+
+
+                icon:
+                const Icon(Icons.home),
+
+
+                label:
+                const Text(
+                    "Home"
                 ),
 
 
@@ -523,13 +620,15 @@ Status: Confirmed
                     MaterialPageRoute(
 
 
-                      builder:(context)=>const HomeScreen(),
+                      builder:(context)=>
+
+                      const HomeScreen(),
 
 
                     ),
 
 
-                    (route)=>false,
+                        (route)=>false,
 
 
                   );
@@ -537,22 +636,29 @@ Status: Confirmed
 
                 },
 
+
               ),
+
 
             ),
 
 
 
+
           ],
+
 
         ),
 
+
       ),
+
 
     );
 
 
   }
+
 
 
 
@@ -567,21 +673,17 @@ Status: Confirmed
       title:Text(title),
 
 
-
       trailing:Text(
-
 
         value,
 
+        style:
+        const TextStyle(
 
-        style:const TextStyle(
-
-
-          fontWeight:FontWeight.bold,
-
+          fontWeight:
+          FontWeight.bold,
 
         ),
-
 
       ),
 
@@ -593,4 +695,3 @@ Status: Confirmed
 
 
 }
-

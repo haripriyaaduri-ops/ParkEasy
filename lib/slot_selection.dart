@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'screens/booking_screen.dart';
+import 'slot_data.dart';
 
 
 class SlotSelection extends StatefulWidget {
 
+  final String parkingName;
   final String vehicleNumber;
   final String vehicleType;
   final String duration;
@@ -13,6 +15,8 @@ class SlotSelection extends StatefulWidget {
   const SlotSelection({
 
     super.key,
+
+    required this.parkingName,
 
     required this.vehicleNumber,
 
@@ -45,6 +49,7 @@ class _SlotSelectionState extends State<SlotSelection> {
 
     return Scaffold(
 
+
       appBar: AppBar(
 
         title: const Text(
@@ -63,7 +68,7 @@ class _SlotSelectionState extends State<SlotSelection> {
 
         backgroundColor: Colors.blue,
 
-        centerTitle: true,
+        centerTitle:true,
 
       ),
 
@@ -80,11 +85,11 @@ class _SlotSelectionState extends State<SlotSelection> {
           children: [
 
 
-            const Text(
+            Text(
 
-              "City Mall Parking",
+              widget.parkingName,
 
-              style: TextStyle(
+              style: const TextStyle(
 
                 fontSize:24,
 
@@ -106,9 +111,9 @@ class _SlotSelectionState extends State<SlotSelection> {
 
               style:TextStyle(
 
-                fontSize:16,
-
                 color:Colors.grey,
+
+                fontSize:16,
 
               ),
 
@@ -122,9 +127,11 @@ class _SlotSelectionState extends State<SlotSelection> {
 
             Expanded(
 
-              child: GridView.builder(
 
-                itemCount:12,
+              child:GridView.builder(
+
+
+                itemCount:SlotData.slots.length,
 
 
                 gridDelegate:
@@ -144,10 +151,18 @@ class _SlotSelectionState extends State<SlotSelection> {
                 itemBuilder:(context,index){
 
 
-                  bool booked = index == 2 || index == 6;
+                  String slotName =
+                  SlotData.slots.keys.elementAt(index);
 
 
-                  bool selected = selectedSlot == index;
+
+                  bool booked =
+                  SlotData.slots[slotName]==false;
+
+
+
+                  bool selected =
+                  selectedSlot==index;
 
 
 
@@ -159,7 +174,7 @@ class _SlotSelectionState extends State<SlotSelection> {
 
                       setState((){
 
-                        selectedSlot = index;
+                        selectedSlot=index;
 
                       });
 
@@ -174,23 +189,19 @@ class _SlotSelectionState extends State<SlotSelection> {
                       decoration:BoxDecoration(
 
 
-                        color:
+                        color:booked
 
-                        booked
+                            ? Colors.red
 
-                        ? Colors.red
+                            : selected
 
-                        : selected
+                            ? Colors.blue
 
-                        ? Colors.blue
-
-                        : Colors.green,
+                            : Colors.green,
 
 
                         borderRadius:
-
                         BorderRadius.circular(15),
-
 
                       ),
 
@@ -201,7 +212,7 @@ class _SlotSelectionState extends State<SlotSelection> {
 
                         child:Text(
 
-                          "A${index+1}",
+                          slotName,
 
 
                           style:const TextStyle(
@@ -210,7 +221,8 @@ class _SlotSelectionState extends State<SlotSelection> {
 
                             fontSize:22,
 
-                            fontWeight:FontWeight.bold,
+                            fontWeight:
+                            FontWeight.bold,
 
                           ),
 
@@ -218,9 +230,7 @@ class _SlotSelectionState extends State<SlotSelection> {
 
                       ),
 
-
                     ),
-
 
                   );
 
@@ -230,11 +240,14 @@ class _SlotSelectionState extends State<SlotSelection> {
 
               ),
 
+
             ),
 
 
 
+
             SizedBox(
+
 
               width:double.infinity,
 
@@ -242,46 +255,76 @@ class _SlotSelectionState extends State<SlotSelection> {
               child:ElevatedButton(
 
 
-                onPressed:selectedSlot == null
 
-                ? null
+                onPressed:selectedSlot==null
 
-                : (){
+                    ? null
+
+                    : (){
 
 
-                  String slotName = "A${selectedSlot! + 1}";
+                  String slotName =
+                  SlotData.slots.keys.elementAt(selectedSlot!);
+
+
+
+                  SlotData.slots[slotName]=false;
 
 
 
                   Navigator.push(
 
+
+
                     context,
+
+
 
                     MaterialPageRoute(
 
-                      builder:(context)=>BookingScreen(
 
 
-                        vehicleNumber: widget.vehicleNumber,
+                      builder:(context)=>
+
+                          BookingScreen(
 
 
-                        vehicleType: widget.vehicleType,
+
+                            parkingName:
+                            widget.parkingName,
 
 
-                        parkingSlot: slotName,
+                            vehicleNumber:
+                            widget.vehicleNumber,
 
 
-                        duration: widget.duration,
+                            vehicleType:
+                            widget.vehicleType,
 
 
-                        amount: widget.amount,
+                            parkingSlot:
+                            slotName,
 
 
-                      ),
+                            duration:
+                            widget.duration,
+
+
+                            amount:
+                            widget.amount,
+
+
+
+                          ),
+
+
 
                     ),
 
+
+
                   );
+
 
 
                 },
@@ -291,7 +334,8 @@ class _SlotSelectionState extends State<SlotSelection> {
 
                   backgroundColor:Colors.blue,
 
-                  padding:const EdgeInsets.all(15),
+                  padding:
+                  const EdgeInsets.all(15),
 
                 ),
 
@@ -311,16 +355,22 @@ class _SlotSelectionState extends State<SlotSelection> {
 
                 ),
 
+
+
               ),
 
-            ),
+
+            )
+
 
 
           ],
 
+
         ),
 
       ),
+
 
     );
 

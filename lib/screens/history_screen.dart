@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../booking_data.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class HistoryScreen extends StatefulWidget {
@@ -8,13 +8,35 @@ class HistoryScreen extends StatefulWidget {
 
 
   @override
-  State<HistoryScreen> createState() => _HistoryScreenState();
+  State<HistoryScreen> createState() =>
+      _HistoryScreenState();
 
 }
 
 
 
+
 class _HistoryScreenState extends State<HistoryScreen> {
+
+
+
+  Future<void> cancelBooking(String bookingId) async {
+
+
+    await FirebaseFirestore.instance
+        .collection("bookings")
+        .doc(bookingId)
+        .update({
+
+      "status": "Cancelled",
+
+    });
+
+
+
+  }
+
+
 
 
   @override
@@ -42,17 +64,57 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
         backgroundColor: Colors.blue,
 
-        centerTitle:true,
+        centerTitle: true,
 
 
       ),
 
 
 
-      body: BookingData.history.isEmpty
+
+      body: StreamBuilder<QuerySnapshot>(
 
 
-          ? const Center(
+
+        stream: FirebaseFirestore.instance
+            .collection("bookings")
+            .orderBy(
+            "createdAt",
+            descending: true
+        )
+            .snapshots(),
+
+
+
+
+
+        builder: (context, snapshot) {
+
+
+
+          if(snapshot.connectionState ==
+              ConnectionState.waiting) {
+
+
+            return const Center(
+
+              child: CircularProgressIndicator(),
+
+            );
+
+
+          }
+
+
+
+
+
+          if(!snapshot.hasData ||
+              snapshot.data!.docs.isEmpty) {
+
+
+
+            return const Center(
 
 
               child: Text(
@@ -66,9 +128,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
                   fontSize:22,
 
-
-                  fontWeight:FontWeight.bold,
-
+                  fontWeight:
+                  FontWeight.bold,
 
                 ),
 
@@ -76,290 +137,371 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
 
 
-            )
+            );
+
+
+          }
 
 
 
-          : ListView.builder(
-
-
-              padding:const EdgeInsets.all(15),
-
-
-              itemCount:BookingData.history.length,
-
-
-              itemBuilder:(context,index){
-
-
-                var booking = BookingData.history[index];
 
 
 
-                bool cancelled =
-                    booking["status"] == "Cancelled";
+          var bookings =
+              snapshot.data!.docs;
 
 
 
-                return Card(
 
 
-                  elevation:5,
-
-
-                  margin:const EdgeInsets.only(bottom:15),
+          return ListView.builder(
 
 
 
-                  child:Padding(
-
-
-                    padding:const EdgeInsets.all(15),
-
-
-
-                    child:Column(
-
-
-                      crossAxisAlignment:CrossAxisAlignment.start,
-
-
-                      children:[
+            padding:
+            const EdgeInsets.all(15),
 
 
 
-                        Text(
+            itemCount:
+            bookings.length,
 
 
-                          booking["parking"] ?? "",
 
 
-                          style:const TextStyle(
+            itemBuilder:(context,index){
 
 
-                            fontSize:20,
+
+              var booking =
+              bookings[index];
 
 
-                            fontWeight:FontWeight.bold,
+
+              bool cancelled =
+                  booking["status"] ==
+                      "Cancelled";
 
 
-                          ),
+
+
+
+              return Card(
+
+
+                elevation:5,
+
+
+                margin:
+                const EdgeInsets.only(
+                    bottom:15
+                ),
+
+
+
+
+                child:Padding(
+
+
+
+                  padding:
+                  const EdgeInsets.all(15),
+
+
+
+                  child:Column(
+
+
+
+                    crossAxisAlignment:
+                    CrossAxisAlignment.start,
+
+
+
+                    children:[
+
+
+
+
+                      Text(
+
+
+
+                        booking["parking"],
+
+
+
+                        style:
+                        const TextStyle(
+
+
+
+                          fontSize:22,
+
+
+                          fontWeight:
+                          FontWeight.bold,
+
 
 
                         ),
 
 
 
-                        const SizedBox(height:10),
+                      ),
 
 
 
-                        Text(
 
-                          "Slot: ${booking["slot"] ?? ""}",
+
+                      const SizedBox(
+                          height:10
+                      ),
+
+
+
+
+
+                      Text(
+
+                        "Booking ID: ${booking["bookingId"]}",
+
+                      ),
+
+
+
+
+
+                      Text(
+
+                        "Slot: ${booking["slot"]}",
+
+                      ),
+
+
+
+
+
+                      Text(
+
+                        "Vehicle Number: ${booking["vehicleNumber"]}",
+
+                      ),
+
+
+
+
+
+                      Text(
+
+                        "Vehicle Type: ${booking["vehicleType"]}",
+
+                      ),
+
+
+
+
+
+                      Text(
+
+                        "Duration: ${booking["duration"]}",
+
+                      ),
+
+
+
+
+
+                      Text(
+
+                        "Amount: ₹${booking["amount"]}",
+
+                      ),
+
+
+
+
+
+                      Text(
+
+                        "Date: ${booking["date"]}",
+
+                      ),
+
+
+
+
+
+
+                      Text(
+
+
+
+                        "Status: ${booking["status"]}",
+
+
+
+                        style: TextStyle(
+
+
+
+                          color:
+                          cancelled
+                              ? Colors.red
+                              : Colors.green,
+
+
+
+                          fontWeight:
+                          FontWeight.bold,
+
+
 
                         ),
 
 
 
-                        Text(
+                      ),
 
-                          "Vehicle: ${booking["vehicle"] ?? ""}",
 
-                        ),
 
 
 
-                        Text(
 
-                          "Type: ${booking["type"] ?? ""}",
+                      const SizedBox(
+                          height:15
+                      ),
 
-                        ),
 
 
 
-                        Text(
 
-                          "Amount: ${booking["amount"] ?? ""}",
 
-                        ),
+                      if(!cancelled)
 
+                        SizedBox(
 
 
-                        const Text(
+                          width:
+                          double.infinity,
 
-                          "Payment Method: UPI",
 
-                        ),
 
+                          child:
+                          ElevatedButton(
 
 
-                        Text(
 
-                          "Date: ${booking["date"] ?? ""}",
+                            onPressed:() async {
 
-                        ),
 
 
+                              await cancelBooking(
+                                  booking.id
+                              );
 
-                        Text(
 
-                          "Status: ${booking["status"] ?? ""}",
 
+                              if(context.mounted){
 
-                          style:TextStyle(
 
 
-                            color: cancelled
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(
 
-                                ? Colors.red
 
-                                : Colors.green,
 
+                                  const SnackBar(
 
-                            fontWeight:FontWeight.bold,
 
 
-                          ),
+                                    content:
+                                    Text(
+                                      "Booking Cancelled Successfully",
+                                    ),
 
-                        ),
 
 
+                                  ),
 
 
-                        const SizedBox(height:15),
 
+                                );
 
 
+                              }
 
-                        Row(
 
 
-                          mainAxisAlignment:
-                          MainAxisAlignment.end,
+                            },
 
 
-                          children:[
 
+                            style:
+                            ElevatedButton.styleFrom(
 
 
-                            if(!cancelled)
 
-                            ElevatedButton.icon(
+                              backgroundColor:
+                              Colors.red,
 
 
-                              onPressed:(){
 
+                              foregroundColor:
+                              Colors.white,
 
-                                setState((){
-
-
-                                  BookingData.history[index]
-                                  ["status"] =
-
-                                  "Cancelled";
-
-
-                                });
-
-
-                              },
-
-
-                              icon:const Icon(
-
-                                Icons.cancel,
-
-                              ),
-
-
-                              label:const Text(
-
-                                "Cancel",
-
-                              ),
-
-
-                              style:ElevatedButton.styleFrom(
-
-
-                                backgroundColor:Colors.red,
-
-
-                                foregroundColor:Colors.white,
-
-
-                              ),
 
 
                             ),
 
 
 
-
-                            const SizedBox(width:10),
-
-
-
-
-                            IconButton(
-
-
-                              icon:const Icon(
-
-
-                                Icons.delete,
-
-
-                                color:Colors.red,
-
-
-                              ),
-
-
-
-                              onPressed:(){
-
-
-                                setState((){
-
-
-                                  BookingData.history
-                                  .removeAt(index);
-
-
-                                });
-
-
-                              },
-
+                            child:
+                            const Text(
+                                "Cancel Booking"
                             ),
 
 
 
-                          ],
-
-
-                        )
+                          ),
 
 
 
-                      ],
+                        ),
 
 
-                    ),
+
+
+
+                    ],
+
 
 
                   ),
 
 
-                );
+
+                ),
 
 
-              },
+
+              );
 
 
-            ),
+
+            },
+
+
+
+          );
+
+
+
+        },
+
+
+
+      ),
 
 
 

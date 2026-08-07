@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 import 'screens/home_screen.dart';
 import 'screens/welcome_screen.dart';
@@ -9,7 +11,20 @@ import 'theme_provider.dart';
 
 
 
-void main() {
+
+void main() async {
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+
+  await Firebase.initializeApp(
+    
+
+    options: DefaultFirebaseOptions.currentPlatform,
+
+  );
+  
+
 
   runApp(
 
@@ -24,18 +39,13 @@ void main() {
   );
 
 }
-
-
-
 class ParkEasyApp extends StatefulWidget {
-
 
   const ParkEasyApp({super.key});
 
 
   @override
   State<ParkEasyApp> createState() => _ParkEasyAppState();
-
 
 }
 
@@ -74,19 +84,13 @@ class _ParkEasyAppState extends State<ParkEasyApp> {
 
     setState(() {
 
-
       isLogin = status;
-
 
     });
 
 
   }
-
-
-
-
-  @override
+    @override
   Widget build(BuildContext context) {
 
 
@@ -113,7 +117,6 @@ class _ParkEasyAppState extends State<ParkEasyApp> {
 
 
 
-
       darkTheme: ThemeData(
 
 
@@ -127,7 +130,6 @@ class _ParkEasyAppState extends State<ParkEasyApp> {
 
 
 
-
       themeMode:
 
           context.watch<ThemeProvider>().isDark
@@ -135,8 +137,6 @@ class _ParkEasyAppState extends State<ParkEasyApp> {
               ? ThemeMode.dark
 
               : ThemeMode.light,
-
-
 
 
 

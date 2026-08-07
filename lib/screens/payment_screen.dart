@@ -4,6 +4,8 @@ import '../booking_confirmed.dart';
 
 class PaymentScreen extends StatefulWidget {
 
+
+  final String parkingName;
   final String vehicleNumber;
   final String vehicleType;
   final String parkingSlot;
@@ -11,9 +13,14 @@ class PaymentScreen extends StatefulWidget {
   final int amount;
 
 
+
   const PaymentScreen({
 
+
     super.key,
+
+
+    required this.parkingName,
 
     required this.vehicleNumber,
 
@@ -25,21 +32,26 @@ class PaymentScreen extends StatefulWidget {
 
     required this.amount,
 
+
   });
 
 
 
+
   @override
-  State<PaymentScreen> createState() => _PaymentScreenState();
+  State<PaymentScreen> createState() =>
+      _PaymentScreenState();
 
 }
+
 
 
 
 class _PaymentScreenState extends State<PaymentScreen> {
 
 
-  String paymentMethod = "UPI";
+  String paymentMethod="UPI";
+
 
 
   @override
@@ -48,56 +60,78 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     return Scaffold(
 
-      appBar: AppBar(
 
-        title: const Text(
+      appBar:AppBar(
+
+
+        title:const Text(
 
           "Payment",
 
-          style: TextStyle(
+          style:TextStyle(
 
-            color: Colors.white,
+            color:Colors.white,
 
           ),
 
         ),
 
-        backgroundColor: Colors.blue,
 
-        centerTitle: true,
+        backgroundColor:Colors.blue,
+
+        centerTitle:true,
+
 
       ),
 
 
 
-      body: Padding(
 
-        padding: const EdgeInsets.all(20),
+      body:Padding(
 
-        child: Column(
 
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding:
+        const EdgeInsets.all(20),
 
-          children: [
+
+
+        child:Column(
+
+
+          crossAxisAlignment:
+          CrossAxisAlignment.start,
+
+
+          children:[
+
 
 
             const Text(
 
+
               "Select Payment Method",
 
-              style: TextStyle(
+
+              style:TextStyle(
+
 
                 fontSize:24,
 
-                fontWeight:FontWeight.bold,
+
+                fontWeight:
+                FontWeight.bold,
+
 
               ),
+
 
             ),
 
 
 
+
             const SizedBox(height:20),
+
 
 
 
@@ -121,6 +155,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
 
 
+
             paymentOption(
 
               "Cash",
@@ -131,82 +166,140 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
 
 
+
             const Spacer(),
+
+
 
 
 
             SizedBox(
 
+
               width:double.infinity,
 
+
               child:ElevatedButton(
+
 
 
                 onPressed:(){
 
 
+
                   Navigator.push(
+
+
 
                     context,
 
+
+
                     MaterialPageRoute(
 
-                      builder:(context)=>BookingConfirmed(
 
-                        vehicleNumber: widget.vehicleNumber,
 
-                        vehicleType: widget.vehicleType,
+                      builder:(context)=>
 
-                        parkingSlot: widget.parkingSlot,
+                          BookingConfirmed(
 
-                        duration: widget.duration,
 
-                        amount: widget.amount,
 
-                      ),
+                            parkingName:
+                            widget.parkingName,
+
+
+                            vehicleNumber:
+                            widget.vehicleNumber,
+
+
+                            vehicleType:
+                            widget.vehicleType,
+
+
+                            parkingSlot:
+                            widget.parkingSlot,
+
+
+                            duration:
+                            widget.duration,
+
+
+                            amount:
+                            widget.amount,
+
+
+
+                          ),
+
+
 
                     ),
 
+
+
                   );
+
 
 
                 },
 
 
+
                 style:ElevatedButton.styleFrom(
 
-                  backgroundColor:Colors.blue,
 
-                  padding:const EdgeInsets.all(15),
+                  backgroundColor:
+                  Colors.blue,
+
+
+                  padding:
+                  const EdgeInsets.all(15),
+
 
                 ),
+
 
 
 
                 child:const Text(
 
+
                   "Pay Now",
+
 
                   style:TextStyle(
 
+
                     color:Colors.white,
+
 
                     fontSize:18,
 
+
                   ),
+
 
                 ),
 
+
+
               ),
 
-            ),
+
+            )
+
+
 
 
           ],
 
+
         ),
 
+
       ),
+
 
     );
 
@@ -217,16 +310,33 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
 
 
-  Widget paymentOption(String title, IconData icon){
+
+
+  Widget paymentOption(
+
+
+      String title,
+
+      IconData icon,
+
+
+      ){
 
 
     return Card(
 
+
+
       child:RadioListTile(
+
+
 
         value:title,
 
+
         groupValue:paymentMethod,
+
+
 
         onChanged:(value){
 
@@ -234,7 +344,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
           setState((){
 
 
-            paymentMethod=value.toString();
+            paymentMethod=
+                value.toString();
 
 
           });
@@ -243,22 +354,29 @@ class _PaymentScreenState extends State<PaymentScreen> {
         },
 
 
+
         title:Text(title),
+
 
 
         secondary:Icon(
 
+
           icon,
 
+
           color:Colors.blue,
+
 
         ),
 
 
+
       ),
 
-    );
 
+
+    );
 
   }
 

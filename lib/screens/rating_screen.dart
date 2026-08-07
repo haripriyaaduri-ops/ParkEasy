@@ -1,56 +1,72 @@
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RatingScreen extends StatefulWidget {
 
-  const RatingScreen({super.key});
+  final String parkingName;
 
+  const RatingScreen({
+    super.key,
+    required this.parkingName,
+  });
 
   @override
   State<RatingScreen> createState() => _RatingScreenState();
-
 }
 
 
-
 class _RatingScreenState extends State<RatingScreen> {
-
 
   int rating = 0;
 
   final reviewController = TextEditingController();
 
 
+  Future<void> saveReview() async {
+
+    await FirebaseFirestore.instance
+        .collection("reviews")
+        .add({
+
+      "parkingName": widget.parkingName,
+
+      "rating": rating,
+
+      "review": reviewController.text,
+
+      "createdAt": Timestamp.now(),
+
+    });
+
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Review Submitted"),
+      ),
+    );
+
+
+    Navigator.pop(context);
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
 
-
     return Scaffold(
-
 
       appBar: AppBar(
 
-        backgroundColor: Colors.blue,
-
-        centerTitle:true,
-
         title: const Text(
-
           "Rate Parking",
-
-          style: TextStyle(
-
-            color: Colors.white,
-
-            fontWeight: FontWeight.bold,
-
-          ),
-
+          style: TextStyle(color: Colors.white),
         ),
 
-      ),
+        backgroundColor: Colors.blue,
 
+      ),
 
 
       body: Padding(
@@ -59,214 +75,102 @@ class _RatingScreenState extends State<RatingScreen> {
 
         child: Column(
 
-          crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
 
 
-            const Text(
-
-              "How was your parking experience?",
-
-              style: TextStyle(
-
+            Text(
+              widget.parkingName,
+              style: const TextStyle(
                 fontSize:22,
-
                 fontWeight:FontWeight.bold,
-
               ),
-
             ),
 
 
-
-            const SizedBox(height:30),
-
+            const SizedBox(height:20),
 
 
             Row(
 
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment:
+              MainAxisAlignment.center,
 
               children: List.generate(5, (index){
 
-
                 return IconButton(
-
 
                   onPressed:(){
 
                     setState((){
 
-                      rating = index + 1;
+                      rating=index+1;
 
                     });
 
-
                   },
 
+                  icon: Icon(
 
-                  icon:Icon(
+                    Icons.star,
 
+                    size:40,
 
-                    index < rating
-
-                        ? Icons.star
-
-                        : Icons.star_border,
-
-
-                    size:45,
-
-
-                    color:Colors.orange,
-
+                    color: index < rating
+                        ? Colors.amber
+                        : Colors.grey,
 
                   ),
 
-
                 );
-
 
               }),
 
             ),
 
 
-
-            const SizedBox(height:30),
-
+            const SizedBox(height:20),
 
 
             TextField(
 
+              controller: reviewController,
 
-              controller:reviewController,
+              maxLines:4,
 
+              decoration: InputDecoration(
 
-              maxLines:5,
-
-
-              decoration:InputDecoration(
-
-
-                hintText:"Write your review...",
-
+                hintText:"Write your review",
 
                 border:OutlineInputBorder(
 
-
-                  borderRadius:BorderRadius.circular(15),
-
+                  borderRadius:
+                  BorderRadius.circular(15),
 
                 ),
 
-
               ),
-
 
             ),
 
 
-
-            const SizedBox(height:30),
-
+            const SizedBox(height:20),
 
 
             SizedBox(
 
-
               width:double.infinity,
-
 
               child:ElevatedButton(
 
-
-                onPressed:(){
-
-
-                  if(rating == 0){
+                onPressed: rating==0
+                    ? null
+                    : saveReview,
 
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-
-
-                      const SnackBar(
-
-
-                        content:Text(
-
-                          "Please select rating",
-
-                        ),
-
-                      ),
-
-                    );
-
-
-                  }
-
-                  else{
-
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-
-
-                      const SnackBar(
-
-
-                        content:Text(
-
-                          "Thank you for your feedback ⭐",
-
-                        ),
-
-                      ),
-
-                    );
-
-
-                    Navigator.pop(context);
-
-
-                  }
-
-
-                },
-
-
-                style:ElevatedButton.styleFrom(
-
-
-                  backgroundColor:Colors.blue,
-
-                  padding:const EdgeInsets.all(15),
-
-                ),
-
-
-
-                child:const Text(
-
-
-                  "Submit Review",
-
-
-                  style:TextStyle(
-
-
-                    color:Colors.white,
-
-                    fontSize:18,
-
-                  ),
-
-                ),
-
+                child:
+                const Text("Submit Review"),
 
               ),
-
 
             )
 
@@ -279,8 +183,6 @@ class _RatingScreenState extends State<RatingScreen> {
 
     );
 
-
   }
-
 
 }

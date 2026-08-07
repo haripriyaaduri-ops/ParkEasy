@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 import 'edit_profile_screen.dart';
 import 'login_screen.dart';
+import 'admin_add_parking_screen.dart';
+
 import '../user_data.dart';
 import '../theme_provider.dart';
 
@@ -11,17 +13,21 @@ import '../theme_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
 
+
   const ProfileScreen({super.key});
 
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 
+
 }
 
 
 
+
 class _ProfileScreenState extends State<ProfileScreen> {
+
 
 
   @override
@@ -31,25 +37,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
 
 
-      appBar:AppBar(
+      appBar: AppBar(
 
 
-        title:const Text(
+        title: const Text(
 
           "Profile",
 
-          style:TextStyle(
+          style: TextStyle(
 
-            color:Colors.white,
+            color: Colors.white,
 
           ),
 
         ),
 
 
-        backgroundColor:Colors.blue,
+        backgroundColor: Colors.blue,
 
-        centerTitle:true,
+        centerTitle: true,
 
 
       ),
@@ -57,18 +63,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
-      body:Padding(
+
+      body: Padding(
 
 
-        padding:const EdgeInsets.all(20),
-
-
-
-        child:Column(
+        padding: const EdgeInsets.all(20),
 
 
 
-          children:[
+        child: Column(
+
+
+
+          children: [
+
 
 
 
@@ -78,15 +86,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               radius:50,
 
-
-
               backgroundColor:Colors.blue,
 
 
 
               child:Icon(
-
-
 
                 Icons.person,
 
@@ -94,9 +98,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 color:Colors.white,
 
-
               ),
-
 
 
             ),
@@ -104,7 +106,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
+
             const SizedBox(height:20),
+
+
 
 
 
@@ -135,7 +140,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
+
+
             const SizedBox(height:25),
+
+
 
 
 
@@ -149,6 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               UserData.name,
 
             ),
+
 
 
 
@@ -168,6 +178,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
+
             profileItem(
 
               Icons.directions_car,
@@ -177,6 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               UserData.vehicleType,
 
             ),
+
 
 
 
@@ -195,17 +207,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
-            const SizedBox(height:10),
 
-
-
-
-            // Dark Mode
 
             Card(
 
 
+
               elevation:3,
+
 
 
               child:SwitchListTile(
@@ -214,36 +223,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 title:const Text(
 
-
-
                   "Dark Mode",
-
-
 
                   style:TextStyle(
 
-
-
                     fontWeight:FontWeight.bold,
 
-
                   ),
-
-
 
                 ),
 
 
 
 
+
                 secondary:const Icon(
-
-
 
                   Icons.dark_mode,
 
                   color:Colors.blue,
-
 
                 ),
 
@@ -265,9 +263,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   context
 
-                  .read<ThemeProvider>()
+                      .read<ThemeProvider>()
 
-                  .toggleTheme();
+                      .toggleTheme();
 
 
 
@@ -285,7 +283,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
-            const SizedBox(height:20),
+
+            const SizedBox(height:15),
+
 
 
 
@@ -304,7 +304,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
                 onPressed:() async {
-
 
 
 
@@ -334,7 +333,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
-
                   setState((){});
 
 
@@ -357,13 +355,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
-
                 child:const Text(
 
 
 
                   "Edit Profile",
-
 
 
 
@@ -374,7 +370,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color:Colors.white,
 
                     fontSize:18,
-
 
                   ),
 
@@ -394,7 +389,112 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
+
             const SizedBox(height:15),
+
+
+
+
+
+
+            // ADMIN ADD PARKING BUTTON
+
+
+            SizedBox(
+
+
+
+              width:double.infinity,
+
+
+
+              child:ElevatedButton.icon(
+
+
+
+                icon:const Icon(
+
+                  Icons.local_parking,
+
+                ),
+
+
+
+                label:const Text(
+
+                  "Add Parking (Admin)",
+
+                ),
+
+
+
+
+
+                style:ElevatedButton.styleFrom(
+
+
+
+                  backgroundColor:Colors.green,
+
+                  foregroundColor:Colors.white,
+
+                  padding:const EdgeInsets.all(15),
+
+
+
+                ),
+
+
+
+
+
+                onPressed:(){
+
+
+
+                  Navigator.push(
+
+
+
+                    context,
+
+
+
+                    MaterialPageRoute(
+
+
+
+                      builder:(context)=>
+
+                      const AdminAddParkingScreen(),
+
+
+
+                    ),
+
+
+
+                  );
+
+
+
+                },
+
+
+
+              ),
+
+
+
+            ),
+
+
+
+
+
+
+            const SizedBox(height:15),
+
 
 
 
@@ -423,20 +523,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
+
                   await prefs.setBool(
-
-
 
                     "isLogin",
 
-
-
                     false,
 
-
-
                   );
-
 
 
 
@@ -482,14 +576,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   style:TextStyle(
 
-
-
                     color:Colors.red,
 
-
                   ),
-
-
 
                 ),
 
@@ -500,6 +589,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
             )
+
 
 
 
@@ -532,15 +622,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
-    IconData icon,
+      IconData icon,
 
-    String title,
+      String title,
 
-    String value,
+      String value,
 
-
-
-  ){
+      ){
 
 
 
@@ -552,7 +640,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
 
 
-      margin:const EdgeInsets.only(bottom:12),
+      margin:
+
+      const EdgeInsets.only(bottom:12),
+
 
 
 
@@ -562,12 +653,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         leading:Icon(
 
-
-
           icon,
 
           color:Colors.blue,
-
 
         ),
 
@@ -576,22 +664,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         title:Text(
 
-
-
           title,
-
-
 
           style:const TextStyle(
 
-
-
             fontWeight:FontWeight.bold,
 
-
           ),
-
-
 
         ),
 

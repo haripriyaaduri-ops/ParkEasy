@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'payment_screen.dart';
+import '../payment_page.dart';
+
 
 class BookingScreen extends StatelessWidget {
 
+
+  final String parkingName;
   final String vehicleNumber;
   final String vehicleType;
   final String parkingSlot;
@@ -10,9 +13,14 @@ class BookingScreen extends StatelessWidget {
   final int amount;
 
 
+
   const BookingScreen({
 
+
     super.key,
+
+
+    required this.parkingName,
 
     required this.vehicleNumber,
 
@@ -24,6 +32,7 @@ class BookingScreen extends StatelessWidget {
 
     required this.amount,
 
+
   });
 
 
@@ -31,9 +40,12 @@ class BookingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+
     return Scaffold(
 
+
       appBar: AppBar(
+
 
         title: const Text(
 
@@ -43,45 +55,67 @@ class BookingScreen extends StatelessWidget {
 
             color: Colors.white,
 
-            fontWeight: FontWeight.bold,
-
           ),
 
         ),
 
+
         backgroundColor: Colors.blue,
 
-        centerTitle: true,
+        centerTitle:true,
+
 
       ),
 
 
-      body: Padding(
 
-        padding: const EdgeInsets.all(20),
 
-        child: Column(
+      body:Padding(
 
-          crossAxisAlignment: CrossAxisAlignment.start,
 
-          children: [
+        padding:const EdgeInsets.all(20),
 
-            const Text(
 
-              "Confirm Your Booking",
 
-              style: TextStyle(
+        child:Column(
+
+
+          crossAxisAlignment:
+          CrossAxisAlignment.start,
+
+
+          children:[
+
+
+
+            Text(
+
+
+              parkingName,
+
+
+              style:const TextStyle(
+
 
                 fontSize:26,
 
-                fontWeight:FontWeight.bold,
+
+                fontWeight:
+                FontWeight.bold,
+
 
               ),
+
+
 
             ),
 
 
+
+
             const SizedBox(height:25),
+
+
 
 
 
@@ -91,9 +125,10 @@ class BookingScreen extends StatelessWidget {
 
               "Parking Location",
 
-              "City Mall Parking",
+              parkingName,
 
             ),
+
 
 
 
@@ -109,6 +144,7 @@ class BookingScreen extends StatelessWidget {
 
 
 
+
             bookingCard(
 
               Icons.directions_car,
@@ -118,6 +154,7 @@ class BookingScreen extends StatelessWidget {
               vehicleType,
 
             ),
+
 
 
 
@@ -133,6 +170,7 @@ class BookingScreen extends StatelessWidget {
 
 
 
+
             bookingCard(
 
               Icons.access_time,
@@ -145,6 +183,8 @@ class BookingScreen extends StatelessWidget {
 
 
 
+
+
             bookingCard(
 
               Icons.currency_rupee,
@@ -154,140 +194,222 @@ class BookingScreen extends StatelessWidget {
               "₹$amount",
 
             ),
-                        const Spacer(),
+
+
+
+
+
+            const Spacer(),
+
+
 
 
             SizedBox(
 
-              width: double.infinity,
 
-              child: ElevatedButton(
+              width:double.infinity,
 
 
-                onPressed: () {
+              child:ElevatedButton(
+
+
+
+
+                onPressed:(){
+
 
 
                   Navigator.push(
 
+
+
                     context,
+
+
 
                     MaterialPageRoute(
 
-                      builder: (context) => PaymentScreen(
 
 
-                        vehicleNumber: vehicleNumber,
+                      builder:(context)=>
+
+                          PaymentPage(
 
 
-                        vehicleType: vehicleType,
+
+                            parkingName:
+                            parkingName,
 
 
-                        parkingSlot: parkingSlot,
+                            vehicleNumber:
+                            vehicleNumber,
 
 
-                        duration: duration,
+                            vehicleType:
+                            vehicleType,
 
 
-                        amount: amount,
+                            parkingSlot:
+                            parkingSlot,
 
 
-                      ),
+                            duration:
+                            duration,
+
+
+                            amount:
+                            amount,
+
+
+                          ),
+
+
 
                     ),
 
+
+
                   );
+
 
 
                 },
 
 
-                style: ElevatedButton.styleFrom(
 
-                  backgroundColor: Colors.blue,
 
-                  padding: const EdgeInsets.all(15),
+                style:ElevatedButton.styleFrom(
+
+
+                  backgroundColor:
+                  Colors.blue,
+
+
+                  padding:
+                  const EdgeInsets.all(15),
+
 
                 ),
 
 
-                child: const Text(
+
+                child:const Text(
+
 
                   "Proceed To Payment",
 
-                  style: TextStyle(
 
-                    color: Colors.white,
+                  style:TextStyle(
+
+
+                    color:Colors.white,
+
 
                     fontSize:18,
 
+
                   ),
+
 
                 ),
 
+
+
               ),
 
-            ),
+
+
+            )
+
+
 
 
           ],
 
+
+
         ),
+
 
       ),
 
+
     );
 
+
   }
+
+
+
 
 
 
   Widget bookingCard(
 
-    IconData icon,
 
-    String title,
+      IconData icon,
 
-    String value,
+      String title,
 
-  ){
+      String value,
+
+
+      ){
+
 
     return Card(
 
+
       elevation:3,
 
-      margin: const EdgeInsets.only(bottom:12),
 
-      child: ListTile(
+      margin:
+      const EdgeInsets.only(bottom:12),
 
-        leading: Icon(
+
+
+      child:ListTile(
+
+
+        leading:Icon(
 
           icon,
 
-          color: Colors.blue,
+          color:Colors.blue,
 
         ),
 
 
-        title: Text(
+
+        title:Text(
+
 
           title,
 
-          style: const TextStyle(
 
-            fontWeight: FontWeight.bold,
+          style:const TextStyle(
+
+            fontWeight:
+            FontWeight.bold,
 
           ),
+
 
         ),
 
 
-        subtitle: Text(value),
+
+        subtitle:Text(value),
+
 
 
       ),
 
+
+
     );
 
   }
+
 
 }

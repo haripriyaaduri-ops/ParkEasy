@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'parking_details_screen.dart';
 import 'search_screen.dart';
@@ -27,27 +28,23 @@ class HomeScreen extends StatelessWidget {
 
         title: const Text(
 
-
           "ParkEasy",
 
-
           style: TextStyle(
-
 
             color: Colors.white,
 
             fontWeight: FontWeight.bold,
 
-
           ),
-
 
         ),
 
 
         backgroundColor: Colors.blue,
 
-        centerTitle:true,
+
+        centerTitle: true,
 
 
       ),
@@ -55,14 +52,15 @@ class HomeScreen extends StatelessWidget {
 
 
 
+
       body: Padding(
 
 
-        padding:const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
 
 
 
-        child:Column(
+        child: Column(
 
 
 
@@ -71,7 +69,8 @@ class HomeScreen extends StatelessWidget {
 
 
 
-          children:[
+          children: [
+
 
 
 
@@ -82,12 +81,14 @@ class HomeScreen extends StatelessWidget {
               "Hello, Driver 👋",
 
 
-              style:TextStyle(
+              style: TextStyle(
 
 
                 fontSize:26,
 
-                fontWeight:FontWeight.bold,
+
+                fontWeight:
+                FontWeight.bold,
 
 
               ),
@@ -98,7 +99,9 @@ class HomeScreen extends StatelessWidget {
 
 
 
+
             const SizedBox(height:25),
+
 
 
 
@@ -118,12 +121,13 @@ class HomeScreen extends StatelessWidget {
 
                   context,
 
+
+
                   MaterialPageRoute(
 
 
 
                     builder:(context)=>
-
                     const SearchScreen(),
 
 
@@ -140,7 +144,8 @@ class HomeScreen extends StatelessWidget {
 
 
 
-              child:Container(
+
+              child: Container(
 
 
 
@@ -149,11 +154,15 @@ class HomeScreen extends StatelessWidget {
 
 
 
+
                 decoration:BoxDecoration(
 
 
 
-                  color:Colors.grey.shade200,
+                  color:
+                  Colors.grey.shade200,
+
+
 
                   borderRadius:
                   BorderRadius.circular(15),
@@ -161,6 +170,7 @@ class HomeScreen extends StatelessWidget {
 
 
                 ),
+
 
 
 
@@ -184,6 +194,7 @@ class HomeScreen extends StatelessWidget {
 
 
                     SizedBox(width:10),
+
 
 
 
@@ -214,7 +225,9 @@ class HomeScreen extends StatelessWidget {
 
 
 
+
             const SizedBox(height:25),
+
 
 
 
@@ -234,7 +247,10 @@ class HomeScreen extends StatelessWidget {
 
                 fontSize:22,
 
-                fontWeight:FontWeight.bold,
+
+
+                fontWeight:
+                FontWeight.bold,
 
 
 
@@ -258,100 +274,375 @@ class HomeScreen extends StatelessWidget {
 
 
 
-              child:ListView(
+              child: StreamBuilder<QuerySnapshot>(
 
 
 
-                children:[
+                stream: FirebaseFirestore.instance
 
+                    .collection("parkings")
 
+                    .snapshots(),
 
-                  parkingCard(
 
 
-                    context,
 
 
-                    "Super Market Parking",
+                builder:(context,snapshot){
 
 
-                    "30 Slots Available",
 
+                  if(snapshot.connectionState ==
+                      ConnectionState.waiting){
 
-                    "₹20/hour",
 
 
-                  ),
+                    return const Center(
 
 
 
+                      child:
+                      CircularProgressIndicator(),
 
 
-                  parkingCard(
 
+                    );
 
-                    context,
 
 
-                    "City Mall Parking",
+                  }
 
 
-                    "20 Slots Available",
 
 
-                    "₹30/hour",
 
 
-                  ),
+                  if(!snapshot.hasData ||
+                      snapshot.data!.docs.isEmpty){
 
 
 
+                    return const Center(
 
 
 
-                  parkingCard(
+                      child:Text(
 
 
-                    context,
 
+                        "No Parking Available",
 
-                    "Railway Station Parking",
 
 
-                    "15 Slots Available",
+                        style:TextStyle(
 
 
-                    "₹40/hour",
 
+                          fontSize:20,
 
-                  ),
 
 
+                          fontWeight:
+                          FontWeight.bold,
 
 
 
+                        ),
 
-                  parkingCard(
 
 
-                    context,
+                      ),
 
 
-                    "PVR Parking",
 
+                    );
 
-                    "25 Slots Available",
 
 
-                    "₹50/hour",
+                  }
 
 
-                  ),
 
 
 
 
-                ],
+
+                  return ListView.builder(
+
+
+
+                    itemCount:
+                    snapshot.data!.docs.length,
+
+
+
+
+
+                    itemBuilder:(context,index){
+
+
+
+                      var parking =
+                      snapshot.data!.docs[index];
+
+
+
+
+
+
+                      return Card(
+
+
+
+                        elevation:5,
+
+
+
+                        margin:
+                        const EdgeInsets.only(
+                            bottom:15),
+
+
+
+
+
+
+                        child:ListTile(
+
+
+
+
+
+                          leading:
+                          const CircleAvatar(
+
+
+
+                            backgroundColor:
+                            Colors.blue,
+
+
+
+                            child:Icon(
+
+
+
+                              Icons.local_parking,
+
+
+
+                              color:
+                              Colors.white,
+
+
+
+                            ),
+
+
+
+                          ),
+
+
+
+
+
+
+                          title:Text(
+
+
+
+                            parking["name"],
+
+
+
+                            style:
+                            const TextStyle(
+
+
+
+                              fontWeight:
+                              FontWeight.bold,
+
+
+
+                            ),
+
+
+
+                          ),
+
+
+
+
+
+
+                          subtitle:Column(
+
+
+
+                            crossAxisAlignment:
+                            CrossAxisAlignment.start,
+
+
+
+                            children:[
+
+
+
+                              Text(
+
+                                parking["address"],
+
+                              ),
+
+
+
+
+                              Text(
+
+                                "${parking["slots"]} Slots Available",
+
+                              ),
+
+
+
+
+                            ],
+
+
+
+                          ),
+
+
+
+
+
+
+                          trailing:Text(
+
+
+
+                            "₹${parking["price"]}/hour",
+
+
+
+                            style:
+                            const TextStyle(
+
+
+
+                              color:
+                              Colors.green,
+
+
+
+                              fontWeight:
+                              FontWeight.bold,
+
+
+
+                            ),
+
+
+
+                          ),
+
+
+
+
+
+
+
+                          onTap:(){
+
+
+
+
+
+                            Navigator.push(
+
+
+
+
+
+                              context,
+
+
+
+                              MaterialPageRoute(
+
+
+
+                                builder:(context)=>
+
+                                ParkingDetails(
+
+
+
+                                  name:
+                                  parking["name"],
+
+
+
+                                  slots:
+                                  "${parking["slots"]} Slots Available",
+
+
+
+                                  price:
+                                  "₹${parking["price"]}",
+
+
+
+                                  latitude:
+                                  parking["latitude"].toString(),
+
+
+
+                                  longitude:
+                                  parking["longitude"].toString(),
+
+
+
+                                ),
+
+
+
+                              ),
+
+
+
+                            );
+
+
+
+
+
+                          },
+
+
+
+
+
+                        ),
+
+
+
+
+                      );
+
+
+
+                    },
+
+
+
+                  );
+
+
+
+
+                },
 
 
 
@@ -360,6 +651,7 @@ class HomeScreen extends StatelessWidget {
 
 
             ),
+
 
 
 
@@ -377,6 +669,7 @@ class HomeScreen extends StatelessWidget {
 
 
 
+
       bottomNavigationBar:
       BottomNavigationBar(
 
@@ -389,24 +682,30 @@ class HomeScreen extends StatelessWidget {
           BottomNavigationBarItem(
 
 
+
             icon:Icon(Icons.home),
+
 
 
             label:"Home",
 
 
+
           ),
 
 
 
 
           BottomNavigationBarItem(
+
 
 
             icon:Icon(Icons.history),
 
 
+
             label:"History",
+
 
 
           ),
@@ -414,13 +713,17 @@ class HomeScreen extends StatelessWidget {
 
 
 
+
           BottomNavigationBarItem(
+
 
 
             icon:Icon(Icons.person),
 
 
+
             label:"Profile",
+
 
 
           ),
@@ -428,6 +731,8 @@ class HomeScreen extends StatelessWidget {
 
 
         ],
+
+
 
 
 
@@ -446,12 +751,13 @@ class HomeScreen extends StatelessWidget {
 
               context,
 
+
+
               MaterialPageRoute(
 
 
 
                 builder:(context)=>
-
                 const HistoryScreen(),
 
 
@@ -469,6 +775,7 @@ class HomeScreen extends StatelessWidget {
 
 
 
+
           if(index==2){
 
 
@@ -479,12 +786,13 @@ class HomeScreen extends StatelessWidget {
 
               context,
 
+
+
               MaterialPageRoute(
 
 
 
                 builder:(context)=>
-
                 const ProfileScreen(),
 
 
@@ -514,251 +822,6 @@ class HomeScreen extends StatelessWidget {
 
 
   }
-
-
-
-
-
-
-  static Widget parkingCard(
-
-
-      BuildContext context,
-
-
-      String name,
-
-
-      String slots,
-
-
-      String price,
-
-
-      ){
-
-
-
-
-
-    return Card(
-
-
-
-      elevation:5,
-
-
-
-      margin:
-      const EdgeInsets.only(bottom:15),
-
-
-
-
-      child:ListTile(
-
-
-
-        leading:const CircleAvatar(
-
-
-
-          backgroundColor:Colors.blue,
-
-
-
-          child:Icon(
-
-
-
-            Icons.local_parking,
-
-
-            color:Colors.white,
-
-
-
-          ),
-
-
-
-        ),
-
-
-
-
-        title:Text(
-
-
-
-          name,
-
-
-
-          style:const TextStyle(
-
-
-
-            fontWeight:FontWeight.bold,
-
-
-          ),
-
-
-
-        ),
-
-
-
-
-
-        subtitle:Text(slots),
-
-
-
-
-
-        trailing:Text(
-
-
-
-          price,
-
-
-
-          style:const TextStyle(
-
-
-
-            color:Colors.green,
-
-
-            fontWeight:FontWeight.bold,
-
-
-          ),
-
-
-
-        ),
-
-
-
-
-
-
-        onTap:(){
-
-
-
-          String lat="";
-          String lng="";
-
-
-
-          if(name=="Super Market Parking"){
-
-
-            lat="17.3850";
-
-            lng="78.4867";
-
-
-          }
-
-          else if(name=="City Mall Parking"){
-
-
-            lat="16.5062";
-
-            lng="80.6480";
-
-
-          }
-
-          else if(name=="Railway Station Parking"){
-
-
-            lat="13.6288";
-
-            lng="79.4192";
-
-
-          }
-
-          else if(name=="PVR Parking"){
-
-
-            lat="19.0760";
-
-            lng="72.8777";
-
-
-          }
-
-
-
-
-          Navigator.push(
-
-
-
-            context,
-
-
-
-            MaterialPageRoute(
-
-
-
-              builder:(context)=>
-
-              ParkingDetails(
-
-
-
-                name:name,
-
-
-                slots:slots,
-
-
-                price:price,
-
-
-                latitude:lat,
-
-
-                longitude:lng,
-
-
-
-              ),
-
-
-
-            ),
-
-
-
-          );
-
-
-
-        },
-
-
-
-      ),
-
-
-
-    );
-
-
-
-  }
-
 
 
 }
