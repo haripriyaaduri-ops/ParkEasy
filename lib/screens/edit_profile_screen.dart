@@ -2,642 +2,295 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-
-
 class EditProfileScreen extends StatefulWidget {
-
-
   const EditProfileScreen({super.key});
 
-
   @override
-  State<EditProfileScreen> createState() =>
-      _EditProfileScreenState();
-
-
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-
-
-
-
-class _EditProfileScreenState
-    extends State<EditProfileScreen> {
-
-
-
-  final nameController =
-      TextEditingController();
-
-
-  final emailController =
-      TextEditingController();
-
-
-  final vehicleNumberController =
-      TextEditingController();
-
-
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final vehicleNumberController = TextEditingController();
 
   String vehicleType = "Car";
-
-
   bool loading = true;
 
-
-
-
   @override
-  void initState(){
-
+  void initState() {
     super.initState();
-
     loadUserData();
-
   }
-
-
-
-
-
 
   Future<void> loadUserData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
 
+      if (user == null) {
+        setState(() {
+          loading = false;
+        });
+        return;
+      }
 
-    final user =
-        FirebaseAuth.instance.currentUser;
+      final snapshot = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .get();
 
+      if (snapshot.exists) {
+        final data = snapshot.data()!;
 
+        nameController.text = data["name"] ?? "";
+        emailController.text = data["email"] ?? "";
+        vehicleNumberController.text =
+            data["vehicleNumber"] ?? "";
 
-    final snapshot =
-        await FirebaseFirestore.instance
-            .collection("users")
-            .doc(user!.uid)
-            .get();
+        vehicleType = data["vehicleType"] ?? "Car";
+      } else {
+        emailController.text = user.email ?? "";
+      }
 
+      setState(() {
+        loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        loading = false;
+      });
 
-
-    if(snapshot.exists){
-
-
-      final data =
-          snapshot.data()!;
-
-
-
-      nameController.text =
-          data["name"] ?? "";
-
-
-
-      emailController.text =
-          data["email"] ?? "";
-
-
-
-      vehicleNumberController.text =
-          data["vehicleNumber"] ?? "";
-
-
-
-      vehicleType =
-          data["vehicleType"] ?? "Car";
-
-
+      debugPrint("Error loading profile: $e");
     }
-
-
-
-    setState(() {
-
-
-      loading = false;
-
-
-    });
-
-
   }
-
-
-
-
-
-
 
   Future<void> updateProfile() async {
+    final user = FirebaseAuth.instance.currentUser;
 
-
-
-    final user =
-        FirebaseAuth.instance.currentUser;
-
-
-
-
-    await FirebaseFirestore.instance
-        .collection("users")
-        .doc(user!.uid)
-        .update({
-
-
-
-      "name":
-      nameController.text.trim(),
-
-
-
-      "email":
-      emailController.text.trim(),
-
-
-
-      "vehicleType":
-      vehicleType,
-
-
-
-      "vehicleNumber":
-      vehicleNumberController.text.trim(),
-
-
-
-    });
-
-
-
-
-
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
-
-
-
-      const SnackBar(
-
-        content:
-        Text(
-          "Profile Updated Successfully",
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("User not logged in"),
         ),
+      );
+      return;
+    }
 
-      ),
+    if (nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter your name"),
+        ),
+      );
+      return;
+    }
 
+    if (emailController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter your email"),
+        ),
+      );
+      return;
+    }
 
+    try {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
+          .set(
+        {
+          "name": nameController.text.trim(),
+          "email": emailController.text.trim(),
+          "vehicleType": vehicleType,
+          "vehicleNumber":
+              vehicleNumberController.text.trim(),
+          "updatedAt": Timestamp.now(),
+        },
+        SetOptions(merge: true),
+      );
 
-    );
+      if (!mounted) return;
 
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "Profile Updated Successfully",
+          ),
+        ),
+      );
 
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
 
-
-
-    Navigator.pop(context);
-
-
-
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            "Error updating profile: $e",
+          ),
+        ),
+      );
+    }
   }
 
-
-
-
-
-
-
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    vehicleNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return Scaffold(
-
-
-
       appBar: AppBar(
-
-
-
-        title:
-        const Text(
-
+        title: const Text(
           "Edit Profile",
-
-          style:
-          TextStyle(
-
-            color:Colors.white,
-
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
-
         ),
-
-
-
-        backgroundColor:
-        Colors.blue,
-
-        centerTitle:true,
-
-
-
+        backgroundColor: Colors.blue,
+        centerTitle: true,
       ),
 
-
-
-
-
-
-      body:
-
-
-
-      loading
-
-
-
+      body: loading
           ? const Center(
-
-        child:
-        CircularProgressIndicator(),
-
-      )
-
-
-
-          :
-
-      Padding(
-
-
-
-        padding:
-        const EdgeInsets.all(20),
-
-
-
-        child:
-        Column(
-
-
-
-          children:[
-
-
-
-
-
-            TextField(
-
-
-
-              controller:
-              nameController,
-
-
-
-              decoration:
-              InputDecoration(
-
-
-
-                labelText:
-                "Name",
-
-
-
-                border:
-                OutlineInputBorder(
-
-
-
-                  borderRadius:
-                  BorderRadius.circular(15),
-
-
-
-                ),
-
-
-
-              ),
-
-
-
-            ),
-
-
-
-
-
-            const SizedBox(height:15),
-
-
-
-
-
-
-            TextField(
-
-
-
-              controller:
-              emailController,
-
-
-
-              decoration:
-              InputDecoration(
-
-
-
-                labelText:
-                "Email",
-
-
-
-                border:
-                OutlineInputBorder(
-
-
-
-                  borderRadius:
-                  BorderRadius.circular(15),
-
-
-
-                ),
-
-
-
-              ),
-
-
-
-            ),
-
-
-
-
-
-
-            const SizedBox(height:15),
-
-
-
-
-
-
-            DropdownButtonFormField<String>(
-
-
-
-              value:
-              vehicleType,
-
-
-
-              decoration:
-              InputDecoration(
-
-
-
-                labelText:
-                "Vehicle Type",
-
-
-
-                border:
-                OutlineInputBorder(
-
-
-
-                  borderRadius:
-                  BorderRadius.circular(15),
-
-
-
-                ),
-
-
-
-              ),
-
-
-
-
-              items:[
-
-                "Car",
-
-                "Bike",
-
-                "Auto",
-
-              ]
-
-                  .map((e)=>DropdownMenuItem(
-
-
-
-                value:e,
-
-
-
-                child:
-                Text(e),
-
-
-
-              ))
-
-                  .toList(),
-
-
-
-
-
-              onChanged:(value){
-
-
-
-                setState((){
-
-
-
-                  vehicleType =
-                  value!;
-
-
-
-                });
-
-
-
-              },
-
-
-
-            ),
-
-
-
-
-
-
-            const SizedBox(height:15),
-
-
-
-
-
-
-            TextField(
-
-
-
-              controller:
-              vehicleNumberController,
-
-
-
-              decoration:
-              InputDecoration(
-
-
-
-                labelText:
-                "Vehicle Number",
-
-
-
-                border:
-                OutlineInputBorder(
-
-
-
-                  borderRadius:
-                  BorderRadius.circular(15),
-
-
-
-                ),
-
-
-
-              ),
-
-
-
-            ),
-
-
-
-
-
-
-            const Spacer(),
-
-
-
-
-
-
-            SizedBox(
-
-
-
-              width:
-              double.infinity,
-
-
-
-              child:
-              ElevatedButton(
-
-
-
-                onPressed:
-                updateProfile,
-
-
-
-                style:
-                ElevatedButton.styleFrom(
-
-
-
-                  backgroundColor:
-                  Colors.blue,
-
-
-
-                  padding:
-                  const EdgeInsets.all(15),
-
-
-
-                ),
-
-
-
-                child:
-                const Text(
-
-
-
-                  "Save Changes",
-
-
-
-                  style:
-                  TextStyle(
-
-
-
-                    color:
-                    Colors.white,
-
-
-
-                    fontSize:
-                    18,
-
-
-
+              child: CircularProgressIndicator(),
+            )
+          : Padding(
+              padding: const EdgeInsets.all(20),
+
+              child: Column(
+                children: [
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: "Name",
+                      prefixIcon: const Icon(
+                        Icons.person,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(15),
+                      ),
+                    ),
                   ),
 
+                  const SizedBox(height: 15),
 
+                  TextField(
+                    controller: emailController,
+                    keyboardType:
+                        TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: "Email",
+                      prefixIcon: const Icon(
+                        Icons.email,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(15),
+                      ),
+                    ),
+                  ),
 
-                ),
+                  const SizedBox(height: 15),
 
+                  DropdownButtonFormField<String>(
+                    value: vehicleType,
 
+                    decoration: InputDecoration(
+                      labelText: "Vehicle Type",
+                      prefixIcon: const Icon(
+                        Icons.directions_car,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(15),
+                      ),
+                    ),
 
+                    items: const [
+                      DropdownMenuItem(
+                        value: "Car",
+                        child: Text("Car"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Bike",
+                        child: Text("Bike"),
+                      ),
+                      DropdownMenuItem(
+                        value: "Auto",
+                        child: Text("Auto"),
+                      ),
+                    ],
+
+                    onChanged: (value) {
+                      if (value == null) return;
+
+                      setState(() {
+                        vehicleType = value;
+                      });
+                    },
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  TextField(
+                    controller:
+                        vehicleNumberController,
+                    textCapitalization:
+                        TextCapitalization.characters,
+                    decoration: InputDecoration(
+                      labelText: "Vehicle Number",
+                      prefixIcon: const Icon(
+                        Icons.confirmation_number,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius:
+                            BorderRadius.circular(15),
+                      ),
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  SizedBox(
+                    width: double.infinity,
+
+                    child: ElevatedButton(
+                      onPressed: updateProfile,
+
+                      style:
+                          ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding:
+                            const EdgeInsets.all(15),
+                        shape:
+                            RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(15),
+                        ),
+                      ),
+
+                      child: const Text(
+                        "Save Changes",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight:
+                              FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-
-
-
-            )
-
-
-
-
-
-          ],
-
-
-
-        ),
-
-
-
-      ),
-
-
-
+            ),
     );
-
-
-
   }
-
-
 }
