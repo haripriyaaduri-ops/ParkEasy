@@ -1,294 +1,146 @@
 import 'package:flutter/material.dart';
 import 'payment_screen.dart';
 
-
 class BookingScreen extends StatelessWidget {
-
   final String vehicleNumber;
   final String vehicleType;
   final String parkingSlot;
-
+  final String parkingName;
+  final String parkingPrice;
 
   const BookingScreen({
-
     super.key,
-
     required this.vehicleNumber,
-
     required this.vehicleType,
-
     required this.parkingSlot,
-
+    required this.parkingName,
+    required this.parkingPrice,
   });
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-
       appBar: AppBar(
-
         title: const Text(
-
           "Booking Details",
-
           style: TextStyle(
-
             color: Colors.white,
-
             fontWeight: FontWeight.bold,
-
           ),
-
         ),
-
         backgroundColor: Colors.blue,
-
         centerTitle: true,
-
       ),
-
-
-
       body: Padding(
-
         padding: const EdgeInsets.all(20),
-
         child: Column(
-
           crossAxisAlignment: CrossAxisAlignment.start,
-
           children: [
-
-
             const Text(
-
               "Confirm Your Booking",
-
               style: TextStyle(
-
-                fontSize:26,
-
-                fontWeight:FontWeight.bold,
-
+                fontSize: 26,
+                fontWeight: FontWeight.bold,
               ),
-
             ),
 
-
-
-            const SizedBox(height:25),
-
-
+            const SizedBox(height: 25),
 
             bookingCard(
-
               Icons.local_parking,
-
               "Parking Location",
-
-              "City Mall Parking",
-
+              parkingName,
             ),
 
-
-
             bookingCard(
-
               Icons.event_seat,
-
               "Parking Slot",
-
               parkingSlot,
-
             ),
 
-
-
             bookingCard(
-
               Icons.directions_car,
-
               "Vehicle Type",
-
               vehicleType,
-
             ),
 
-
-
             bookingCard(
-
               Icons.confirmation_number,
-
               "Vehicle Number",
-
               vehicleNumber,
-
             ),
 
-
-
             bookingCard(
-
               Icons.access_time,
-
               "Duration",
-
               "1 Hour",
-
             ),
-
-
 
             bookingCard(
-
               Icons.currency_rupee,
-
               "Total Amount",
-
-              "₹30",
-
+              parkingPrice,
             ),
-
-
 
             const Spacer(),
 
-
-
             SizedBox(
-
-              width:double.infinity,
-
-              child:ElevatedButton(
-
-
-                onPressed:(){
-
-
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
                   Navigator.push(
-
                     context,
-
                     MaterialPageRoute(
-
-                      builder:(context)=>PaymentScreen(
-
-
+                      builder: (context) => PaymentScreen(
                         vehicleNumber: vehicleNumber,
-
-
                         vehicleType: vehicleType,
-
-
                         parkingSlot: parkingSlot,
-
-
+                        parkingName: parkingName,
+                        parkingPrice: parkingPrice,
                       ),
-
                     ),
-
                   );
-
-
                 },
-
-
-                style:ElevatedButton.styleFrom(
-
-                  backgroundColor:Colors.blue,
-
-                  padding:const EdgeInsets.all(15),
-
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.all(15),
                 ),
-
-
-
-                child:const Text(
-
+                child: const Text(
                   "Proceed To Payment",
-
-                  style:TextStyle(
-
-                    color:Colors.white,
-
-                    fontSize:18,
-
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
                   ),
-
                 ),
-
               ),
-
             ),
-
-
           ],
-
         ),
-
       ),
-
     );
-
-
   }
-
-
 
   Widget bookingCard(
-
     IconData icon,
-
     String title,
-
     String value,
-
-  ){
-
+  ) {
     return Card(
-
-      elevation:3,
-
-      margin:const EdgeInsets.only(bottom:12),
-
-      child:ListTile(
-
-        leading:Icon(
-
+      elevation: 3,
+      margin: const EdgeInsets.only(bottom: 12),
+      child: ListTile(
+        leading: Icon(
           icon,
-
-          color:Colors.blue,
-
+          color: Colors.blue,
         ),
-
-
-        title:Text(
-
+        title: Text(
           title,
-
-          style:const TextStyle(
-
-            fontWeight:FontWeight.bold,
-
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
           ),
-
         ),
-
-
-        subtitle:Text(value),
-
-
+        subtitle: Text(value),
       ),
-
     );
-
-
   }
-
-
 }

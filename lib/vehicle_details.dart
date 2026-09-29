@@ -1,395 +1,137 @@
 import 'package:flutter/material.dart';
-import '../slot_selection.dart';
+import 'slot_selection.dart';
 
 class VehicleDetails extends StatefulWidget {
+  final String parkingName;
+  final String parkingPrice;
 
-  const VehicleDetails({super.key});
-
+  const VehicleDetails({
+    super.key,
+    required this.parkingName,
+    required this.parkingPrice,
+  });
 
   @override
   State<VehicleDetails> createState() => _VehicleDetailsState();
-
 }
 
-
 class _VehicleDetailsState extends State<VehicleDetails> {
-
-
   final vehicleNumberController = TextEditingController();
-
 
   String vehicleType = "Car";
 
-
-
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-
-
       appBar: AppBar(
-
         title: const Text(
-
           "Vehicle Details",
-
           style: TextStyle(
-
             color: Colors.white,
-
           ),
-
         ),
-
         backgroundColor: Colors.blue,
-
         centerTitle: true,
-
       ),
-
-
-
       body: Padding(
-
-
         padding: const EdgeInsets.all(20),
-
-
-
         child: Column(
-
-
-
           crossAxisAlignment: CrossAxisAlignment.start,
-
-
-
           children: [
-
-
-
             const Text(
-
               "Enter Vehicle Details",
-
               style: TextStyle(
-
-                fontSize:24,
-
-                fontWeight:FontWeight.bold,
-
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-
             ),
 
-
-
-            const SizedBox(height:25),
-
-
-
+            const SizedBox(height: 25),
 
             TextField(
-
-
-
               controller: vehicleNumberController,
-
-
-
               decoration: InputDecoration(
-
-
-
-                labelText:"Vehicle Number",
-
-
-
-                hintText:"AP16AB1234",
-
-
-
-                border:OutlineInputBorder(
-
-
-
-                  borderRadius:BorderRadius.circular(15),
-
-
-
+                labelText: "Vehicle Number",
+                hintText: "AP16AB1234",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
-
-
-
               ),
-
-
-
             ),
 
-
-
-
-            const SizedBox(height:20),
-
-
-
+            const SizedBox(height: 20),
 
             const Text(
-
-
-
               "Vehicle Type",
-
-
-
-              style:TextStyle(
-
-
-
-                fontSize:18,
-
-                fontWeight:FontWeight.bold,
-
-
-
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
               ),
-
-
-
             ),
-
-
-
 
             DropdownButton<String>(
-
-
-
               value: vehicleType,
-
-
-
-              isExpanded:true,
-
-
-
-              items:[
-
-
-
+              isExpanded: true,
+              items: [
                 "Car",
-
                 "Bike",
-
                 "Auto",
-
-
-
-              ].map((type){
-
-
-
+              ].map((type) {
                 return DropdownMenuItem(
-
-
-
-                  value:type,
-
-
-
-                  child:Text(type),
-
-
-
+                  value: type,
+                  child: Text(type),
                 );
-
-
-
               }).toList(),
-
-
-
-              onChanged:(value){
-
-
-
+              onChanged: (value) {
                 setState(() {
-
-
-
-                  vehicleType=value!;
-
-
-
+                  vehicleType = value!;
                 });
-
-
-
               },
-
-
-
             ),
 
-
-
-
-            const SizedBox(height:40),
-
-
-
+            const SizedBox(height: 40),
 
             SizedBox(
-
-
-
-              width:double.infinity,
-
-
-
-              child:ElevatedButton(
-
-
-
-                onPressed:(){
-
-
-
-                  if(vehicleNumberController.text.isEmpty){
-
-
-
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  if (vehicleNumberController.text.isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-
-
-
                       const SnackBar(
-
-
-
-                        content:Text(
-
-                          "Enter Vehicle Number",
-
-                        ),
-
+                        content: Text("Enter Vehicle Number"),
                       ),
-
-
-
                     );
-
-
-
-                  }
-
-                  else {
-
-
-
+                  } else {
                     Navigator.push(
-
-
-
                       context,
-
-
-
                       MaterialPageRoute(
-
-
-
-                       builder:(context)=>SlotSelection(
-  vehicleNumber: vehicleNumberController.text,
-  vehicleType: vehicleType,
-),
-
-
-
+                        builder: (context) => SlotSelection(
+                          vehicleNumber:
+                              vehicleNumberController.text,
+                          vehicleType: vehicleType,
+                          parkingName: widget.parkingName,
+                          parkingPrice: widget.parkingPrice,
+                        ),
                       ),
-
-
-
                     );
-
-
-
                   }
-
-
-
                 },
-
-
-
-                style:ElevatedButton.styleFrom(
-
-
-
-                  backgroundColor:Colors.blue,
-
-                  padding:const EdgeInsets.all(15),
-
-
-
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.all(15),
                 ),
-
-
-
-                child:const Text(
-
-
-
+                child: const Text(
                   "Continue",
-
-
-
-                  style:TextStyle(
-
-
-
-                    color:Colors.white,
-
-                    fontSize:18,
-
-
-
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
                   ),
-
-
-
                 ),
-
-
-
               ),
-
-
-
             ),
-
-
-
           ],
-
-
-
         ),
-
-
-
       ),
-
-
-
     );
-
-
-
   }
-
-
 }

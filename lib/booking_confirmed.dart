@@ -4,412 +4,260 @@ import 'screens/rating_screen.dart';
 import 'receipt.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-
 class BookingConfirmed extends StatelessWidget {
-
-
+  final String bookingId;
+  final String parkingName;
+  final String parkingPrice;
+  final String bookingDate;
   final String vehicleNumber;
   final String vehicleType;
   final String parkingSlot;
 
-
-
   const BookingConfirmed({
-
     super.key,
-
+    required this.bookingId,
+    required this.parkingName,
+    required this.parkingPrice,
+    required this.bookingDate,
     required this.vehicleNumber,
-
     required this.vehicleType,
-
     required this.parkingSlot,
-
   });
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
-    final bookingId =
-        "PE${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}";
-
-
-    final bookingDate =
-        "${DateTime.now().day}-${DateTime.now().month}-${DateTime.now().year}";
-
-
-
     return Scaffold(
-
       appBar: AppBar(
-
         backgroundColor: Colors.blue,
-
         centerTitle: true,
-
         title: const Text(
-
           "Booking Confirmed",
-
           style: TextStyle(
-
             color: Colors.white,
-
           ),
-
         ),
-
       ),
 
-
-
       body: SingleChildScrollView(
-
         padding: const EdgeInsets.all(20),
 
         child: Column(
-
           children: [
-
-
             const Icon(
-
               Icons.check_circle,
-
               color: Colors.green,
-
-              size:100,
-
+              size: 100,
             ),
 
-
-
-            const SizedBox(height:15),
-
-
+            const SizedBox(height: 15),
 
             const Text(
-
               "Booking Successful!",
-
-              style:TextStyle(
-
-                fontSize:28,
-
-                fontWeight:FontWeight.bold,
-
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
               ),
-
             ),
 
-
-
-            const SizedBox(height:20),
-
-
+            const SizedBox(height: 20),
 
             Card(
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(15),
 
-              elevation:4,
+                child: Column(
+                  children: [
+                    details(
+                      "Booking ID",
+                      bookingId,
+                    ),
 
-              child:Padding(
+                    details(
+                      "Date",
+                      bookingDate,
+                    ),
 
-                padding:const EdgeInsets.all(15),
+                    details(
+                      "Parking",
+                      parkingName,
+                    ),
 
-                child:Column(
+                    details(
+                      "Slot",
+                      parkingSlot,
+                    ),
 
-                  children:[
+                    details(
+                      "Vehicle Number",
+                      vehicleNumber,
+                    ),
 
+                    details(
+                      "Vehicle Type",
+                      vehicleType,
+                    ),
 
-                    details("Booking ID", bookingId),
+                    details(
+                      "Amount",
+                      parkingPrice,
+                    ),
 
-                    details("Date", bookingDate),
-
-                    details("Parking", "City Mall Parking"),
-
-                    details("Slot", parkingSlot),
-
-                    details("Vehicle Number", vehicleNumber),
-
-                    details("Vehicle Type", vehicleType),
-
-                    details("Amount", "₹30"),
-
-                    details("Status", "Confirmed"),
-
-
+                    details(
+                      "Status",
+                      "Confirmed",
+                    ),
                   ],
-
                 ),
-
               ),
-
             ),
 
+            const SizedBox(height: 25),
 
-            const SizedBox(height:25),
-                        QrImageView(
-
+            QrImageView(
               data: """
-
 ParkEasy Booking
 
 Booking ID: $bookingId
-Parking: City Mall Parking
+Parking: $parkingName
 Slot: $parkingSlot
 Vehicle: $vehicleNumber
 Vehicle Type: $vehicleType
 Date: $bookingDate
-Amount: ₹30
+Amount: $parkingPrice
 Status: Confirmed
-
 """,
-
-              version:QrVersions.auto,
-
-              size:220,
-
+              version: QrVersions.auto,
+              size: 220,
             ),
 
-
-
-            const SizedBox(height:10),
-
-
+            const SizedBox(height: 10),
 
             const Text(
-
               "Show this QR at Parking Entry",
-
-              style:TextStyle(
-
-                fontWeight:FontWeight.bold,
-
-                color:Colors.grey,
-
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
               ),
-
             ),
 
-
-
-            const SizedBox(height:25),
-
-
-
-            // Download Receipt Button
+            const SizedBox(height: 25),
 
             SizedBox(
+              width: double.infinity,
 
-              width:double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.download),
 
-              child:ElevatedButton.icon(
-
-                icon:const Icon(Icons.download),
-
-                label:const Text(
+                label: const Text(
                   "Download Receipt",
                 ),
 
-                style:ElevatedButton.styleFrom(
-
-                  backgroundColor:Colors.green,
-
-                  foregroundColor:Colors.white,
-
-                  padding:const EdgeInsets.symmetric(
-                    vertical:15,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15,
                   ),
-
                 ),
 
-
-                onPressed:(){
-
-
+                onPressed: () {
                   Navigator.push(
-
                     context,
-
                     MaterialPageRoute(
-
-                      builder:(context)=>ReceiptPage(
-
-                        bookingId:bookingId,
-
-                        vehicleNumber:vehicleNumber,
-
-                        vehicleType:vehicleType,
-
-                        date:bookingDate,
-
+                      builder: (context) => ReceiptPage(
+                        bookingId: bookingId,
+                        vehicleNumber: vehicleNumber,
+                        vehicleType: vehicleType,
+                        date: bookingDate,
                       ),
-
                     ),
-
                   );
-
-
                 },
-
               ),
-
             ),
 
-
-
-            const SizedBox(height:15),
-
-
-
-            // ⭐ Rate Parking Button
+            const SizedBox(height: 15),
 
             SizedBox(
+              width: double.infinity,
 
-              width:double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.star),
 
-              child:ElevatedButton.icon(
-
-                icon:const Icon(Icons.star),
-
-                label:const Text(
+                label: const Text(
                   "Rate Parking",
                 ),
 
-                style:ElevatedButton.styleFrom(
-
-                  backgroundColor:Colors.orange,
-
-                  foregroundColor:Colors.white,
-
-                  padding:const EdgeInsets.symmetric(
-                    vertical:15,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15,
                   ),
-
                 ),
 
-
-                onPressed:(){
-
-
+                onPressed: () {
                   Navigator.push(
-
                     context,
-
                     MaterialPageRoute(
-
-                      builder:(context)=>const RatingScreen(),
-
+                      builder: (context) => const RatingScreen(),
                     ),
-
                   );
-
-
                 },
-
               ),
-
             ),
 
-
-
-            const SizedBox(height:15),
-
-
-
-            // Home Button
+            const SizedBox(height: 15),
 
             SizedBox(
+              width: double.infinity,
 
-              width:double.infinity,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.home),
 
-              child:ElevatedButton.icon(
-
-                icon:const Icon(Icons.home),
-
-                label:const Text(
+                label: const Text(
                   "Go Home",
                 ),
 
-
-                style:ElevatedButton.styleFrom(
-
-                  backgroundColor:Colors.blue,
-
-                  foregroundColor:Colors.white,
-
-                  padding:const EdgeInsets.symmetric(
-                    vertical:15,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15,
                   ),
-
                 ),
 
-
-
-                onPressed:(){
-
-
+                onPressed: () {
                   Navigator.pushAndRemoveUntil(
-
                     context,
-
                     MaterialPageRoute(
-
-                      builder:(context)=>const HomeScreen(),
-
+                      builder: (context) => const HomeScreen(),
                     ),
-
-                    (route)=>false,
-
+                    (route) => false,
                   );
-
-
                 },
-
               ),
-
             ),
-
-
           ],
-
         ),
-
       ),
-
     );
-
-
   }
 
-
-
-  Widget details(String title,String value){
-
-
+  Widget details(
+    String title,
+    String value,
+  ) {
     return ListTile(
+      title: Text(title),
 
-      title:Text(title),
-
-
-      trailing:Text(
-
+      trailing: Text(
         value,
-
-        style:const TextStyle(
-
-          fontWeight:FontWeight.bold,
-
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
         ),
-
       ),
-
     );
-
-
   }
-
-
 }

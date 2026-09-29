@@ -348,7 +348,7 @@ class ParkingDetails extends StatelessWidget {
 
 
 
-                      builder:(context)=>const VehicleDetails(),
+                      builder: (context) => VehicleDetails( parkingName: name, parkingPrice: price, ),
 
 
 

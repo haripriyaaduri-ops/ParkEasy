@@ -1,262 +1,150 @@
 import 'package:flutter/material.dart';
 import 'booking_confirmed.dart';
 
-
 class PaymentScreen extends StatefulWidget {
-
   final String vehicleNumber;
   final String vehicleType;
   final String parkingSlot;
 
+  final String parkingName;
+  final String parkingPrice;
 
   const PaymentScreen({
-
     super.key,
-
     required this.vehicleNumber,
-
     required this.vehicleType,
-
     required this.parkingSlot,
-
+    this.parkingName = "City Mall Parking",
+    this.parkingPrice = "₹30",
   });
-
-
 
   @override
   State<PaymentScreen> createState() => _PaymentScreenState();
-
 }
 
-
-
 class _PaymentScreenState extends State<PaymentScreen> {
-
-
   String paymentMethod = "UPI";
-
-
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
-
       appBar: AppBar(
-
         title: const Text(
-
           "Payment",
-
           style: TextStyle(
-
             color: Colors.white,
-
           ),
-
         ),
-
         backgroundColor: Colors.blue,
-
         centerTitle: true,
-
       ),
 
-
-
       body: Padding(
-
         padding: const EdgeInsets.all(20),
 
         child: Column(
-
           crossAxisAlignment: CrossAxisAlignment.start,
 
           children: [
-
-
             const Text(
-
               "Select Payment Method",
-
               style: TextStyle(
-
-                fontSize:24,
-
-                fontWeight:FontWeight.bold,
-
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
-
             ),
 
-
-
-            const SizedBox(height:20),
-
-
+            const SizedBox(height: 20),
 
             paymentOption(
-
               "UPI",
-
               Icons.account_balance_wallet,
-
             ),
 
-
-
             paymentOption(
-
               "Credit / Debit Card",
-
               Icons.credit_card,
-
             ),
-
-
 
             paymentOption(
-
               "Cash",
-
               Icons.money,
-
             ),
-
-
 
             const Spacer(),
 
-
-
             SizedBox(
+              width: double.infinity,
 
-              width:double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  DateTime now = DateTime.now();
 
-              child:ElevatedButton(
+                  String bookingId =
+                      "PE${now.millisecondsSinceEpoch.toString().substring(7)}";
 
-
-                onPressed:(){
-
+                  String bookingDate =
+                      "${now.day}-${now.month}-${now.year}";
 
                   Navigator.push(
-
                     context,
 
                     MaterialPageRoute(
-
-                      builder:(context)=>BookingConfirmed(
-
+                      builder: (context) => BookingConfirmed(
+                        bookingId: bookingId,
+                        parkingName: widget.parkingName,
+                        parkingPrice: widget.parkingPrice,
+                        bookingDate: bookingDate,
                         vehicleNumber: widget.vehicleNumber,
-
                         vehicleType: widget.vehicleType,
-
                         parkingSlot: widget.parkingSlot,
-
                       ),
-
                     ),
-
                   );
-
-
                 },
 
-
-                style:ElevatedButton.styleFrom(
-
-                  backgroundColor:Colors.blue,
-
-                  padding:const EdgeInsets.all(15),
-
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.all(15),
                 ),
 
-
-
-                child:const Text(
-
+                child: const Text(
                   "Pay Now",
-
-                  style:TextStyle(
-
-                    color:Colors.white,
-
-                    fontSize:18,
-
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 18,
                   ),
-
                 ),
-
               ),
-
             ),
-
-
           ],
-
         ),
-
       ),
-
     );
-
-
   }
 
-
-
-
-
-  Widget paymentOption(String title, IconData icon){
-
-
+  Widget paymentOption(
+    String title,
+    IconData icon,
+  ) {
     return Card(
+      child: RadioListTile(
+        value: title,
+        groupValue: paymentMethod,
 
-
-      child:RadioListTile(
-
-
-        value:title,
-
-
-        groupValue:paymentMethod,
-
-
-        onChanged:(value){
-
-
-          setState((){
-
-
-            paymentMethod=value.toString();
-
-
+        onChanged: (value) {
+          setState(() {
+            paymentMethod = value.toString();
           });
-
-
         },
 
+        title: Text(title),
 
-        title:Text(title),
-
-
-        secondary:Icon(
-
+        secondary: Icon(
           icon,
-
-          color:Colors.blue,
-
+          color: Colors.blue,
         ),
-
-
       ),
-
-
     );
-
-
   }
-
-
 }
